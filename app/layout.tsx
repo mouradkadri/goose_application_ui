@@ -4,9 +4,9 @@ import { GeistMono } from 'geist/font/mono'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'v0 App',
-  description: 'Created with v0',
-  generator: 'v0.app',
+  title: 'GOOSE JOBS - AI-Powered Job Matcher',
+  description: 'the First AI-Powered Job Matcher that Analyzes Your Resume to Find the Perfect Job Opportunities Tailored Just for You. Upload Your Resume and Let Our Advanced AI Do the Rest!',
+  generator: 'goose jobs 2026',
 }
 
 export default function RootLayout({

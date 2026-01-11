@@ -1,32 +1,24 @@
 "use client"
 
+// 1. Import the correct Job type from your central types file
+import { Job } from "@/types/job"; 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { FileText, Zap } from "lucide-react"
 
-interface Job {
-  id: number
-  title: string
-  company: string
-  location: string
-  description: string
-  salary: string
-  posted: string
-  matchScore: number
-  requirements: string[]
-  benefits: string[]
-}
+// 2. Remove the old, local Job interface that was here.
 
+// 3. Update the props to use the imported Job type
 interface ResumeTabProps {
   resumeUploaded: boolean
-  selectedJob: Job
+  selectedJob: Job // This now refers to the correct type
   onResumeUpload: () => void
 }
 
 export function ResumeTab({ resumeUploaded, selectedJob, onResumeUpload }: ResumeTabProps) {
   const handleFitResumeToJob = () => {
+    // This logic remains the same
     console.log("[v0] Fitting resume to job:", selectedJob.title)
-    // This would trigger AI-powered resume optimization
     alert(`Optimizing your resume for ${selectedJob.title} at ${selectedJob.company}...`)
   }
 
@@ -35,19 +27,21 @@ export function ResumeTab({ resumeUploaded, selectedJob, onResumeUpload }: Resum
       <CardHeader>
         <CardTitle className="flex items-center gap-2 font-sans">
           <FileText className="h-5 w-5" />
-          Resume
+          Your Resume
         </CardTitle>
       </CardHeader>
       <CardContent>
         {resumeUploaded ? (
           <div className="space-y-4">
-            <div className="bg-muted p-4 rounded-lg">
-              <h3 className="font-semibold mb-2">John Doe</h3>
+            {/* --- This section currently uses hardcoded resume data --- */}
+            {/* In the future, you would pass parsed resume data as a prop */}
+            {/* and display it dynamically here. See the enhanced example below. */}
+            <div className="bg-muted p-4 rounded-lg border">
+              <h3 className="font-semibold mb-2">John Doe's Resume (Example)</h3>
               <p className="text-sm text-muted-foreground mb-4">
                 Senior Software Engineer with 8+ years of experience in full-stack development, specializing in React,
                 Node.js, and cloud technologies.
               </p>
-
               <div className="space-y-3">
                 <div>
                   <h4 className="font-medium text-sm">Experience</h4>
@@ -57,7 +51,6 @@ export function ResumeTab({ resumeUploaded, selectedJob, onResumeUpload }: Resum
                     <br />• Junior Developer at WebSolutions (2016-2018)
                   </p>
                 </div>
-
                 <div>
                   <h4 className="font-medium text-sm">Skills</h4>
                   <p className="text-sm text-muted-foreground">
@@ -67,7 +60,7 @@ export function ResumeTab({ resumeUploaded, selectedJob, onResumeUpload }: Resum
               </div>
             </div>
 
-            <div className="flex gap-3">
+            <div className="flex flex-col sm:flex-row gap-3">
               <Button variant="outline" className="flex-1 bg-transparent">
                 View Full Resume
               </Button>

@@ -29,7 +29,7 @@ export function JobList({ jobs, selectedJob, onJobSelect, resumeUploaded }: JobL
   return (
     <div className="w-full h-full border-r border-border bg-sidebar">
       <div className="p-3 md:p-4 border-b border-sidebar-border">
-        <h2 className="text-base md:text-lg font-semibold text-sidebar-foreground font-sans">Top 100 Matches</h2>
+        <h2 className="text-base md:text-lg font-semibold text-sidebar-foreground font-sans">Top Matches Found</h2>
         <p className="text-xs md:text-sm text-muted-foreground">
           {resumeUploaded ? "Ranked by compatibility" : "Upload resume to see matches"}
         </p>
