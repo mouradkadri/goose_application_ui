@@ -1,0 +1,10 @@
+User-agent: *
+# Allow the public entry page to be indexed
+Allow: /enter
+Allow: /opengraph-image
+
+# Keep the app and API routes private
+Disallow: /api/
+Disallow: /
+
+Sitemap: /sitemap.xml
