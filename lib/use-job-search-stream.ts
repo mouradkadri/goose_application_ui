@@ -41,6 +41,20 @@ export function useJobSearchStream() {
       }
     }
 
+    // Map onboarding seniority → backend experience_level
+    try {
+      const stored = localStorage.getItem("gj_onboarded")
+      if (stored) {
+        const prefs = JSON.parse(stored) as { seniority?: string }
+        const map: Record<string, string> = {
+          "Junior": "entry", "Mid-level": "mid",
+          "Senior": "senior", "Lead": "executive", "Any": "mid",
+        }
+        const level = map[prefs.seniority ?? ""] ?? "mid"
+        formData.append("experience_level", level)
+      }
+    } catch { /* ignore */ }
+
     try {
       const response = await fetch("/api/find-jobs-stream/", { method: "POST", body: formData })
       if (!response.body) throw new Error("No response body from server")

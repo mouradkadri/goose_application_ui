@@ -4,8 +4,11 @@ import { useState } from "react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { CopilotJob, STATUS_COLORS } from "@/types/copilot-job"
-import { ExternalLink, ChevronRight, SkipForward, CheckCircle2, MapPin, Banknote } from "lucide-react"
+import { ExternalLink, ChevronRight, SkipForward, CheckCircle2, MapPin, Banknote, FileText, FileDown, Loader2 } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { toast } from "sonner"
+import { renderResumePdf, renderCoverLetterPdf } from "@/lib/doc-export-pdf"
+import { downloadBlob, safeFilename } from "@/lib/doc-export"
 
 interface QuickApplyModalProps {
   jobs: CopilotJob[]
@@ -13,14 +16,23 @@ interface QuickApplyModalProps {
   onClose: () => void
 }
 
+function getResumeText(): string {
+  try {
+    const stored = localStorage.getItem("gj_onboarded")
+    if (stored) return (JSON.parse(stored) as { resumeText?: string }).resumeText ?? ""
+  } catch { /* ignore */ }
+  return ""
+}
+
 export function QuickApplyModal({ jobs, onApplied, onClose }: QuickApplyModalProps) {
   const [index, setIndex] = useState(0)
   const [appliedIds, setAppliedIds] = useState<string[]>([])
   const [skippedIds, setSkippedIds] = useState<string[]>([])
+  const [cvLoading, setCvLoading] = useState(false)
+  const [resumeLoading, setResumeLoading] = useState(false)
 
   const done = index >= jobs.length
   const job = jobs[index] ?? null
-  const totalDone = appliedIds.length + skippedIds.length
 
   const handleApplied = () => {
     if (!job) return
@@ -38,10 +50,62 @@ export function QuickApplyModal({ jobs, onApplied, onClose }: QuickApplyModalPro
   const handleOpenAndApply = () => {
     if (!job?.applyUrl) return
     window.open(job.applyUrl, '_blank')
-    // Prompt applied after a moment so the tab has time to open
-    setTimeout(() => {
-      // The dialog stays open; user clicks "Applied" button
-    }, 300)
+  }
+
+  const handleCoverLetterPdf = async () => {
+    if (!job) return
+    const resumeText = getResumeText()
+    if (!resumeText) { toast.error("Resume text not found — complete onboarding first"); return }
+    setCvLoading(true)
+    try {
+      const res = await fetch("/api/generate/cover-letter/", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          resume_text: resumeText,
+          job_description: job.description ?? "",
+          job_title: job.title,
+          company: job.company,
+        }),
+      })
+      if (!res.ok) throw new Error(await res.text())
+      const data = await res.json() as { cover_letter: string }
+      const blob = await renderCoverLetterPdf(data.cover_letter, { company: job.company, jobTitle: job.title })
+      downloadBlob(blob, safeFilename(job.company, job.title) + "_cover_letter.pdf")
+    } catch (e) {
+      toast.error("Cover letter generation failed")
+      console.error(e)
+    } finally {
+      setCvLoading(false)
+    }
+  }
+
+  const handleResumePdf = async () => {
+    if (!job) return
+    const resumeText = getResumeText()
+    if (!resumeText) { toast.error("Resume text not found — complete onboarding first"); return }
+    setResumeLoading(true)
+    try {
+      const res = await fetch("/api/generate/resume-document/", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          resume_text: resumeText,
+          job_description: job.description ?? "",
+          job_title: job.title,
+          company: job.company,
+        }),
+      })
+      if (!res.ok) throw new Error(await res.text())
+      const data = await res.json() as { resume: Parameters<typeof renderResumePdf>[0] }
+      const blob = await renderResumePdf(data.resume)
+      downloadBlob(blob, safeFilename(job.company, job.title) + "_resume.pdf")
+    } catch (e) {
+      toast.error("Resume generation failed")
+      console.error(e)
+    } finally {
+      setResumeLoading(false)
+    }
   }
 
   const hasSalary = job?.salary && !['not specified', 'competitive', ''].includes((job.salary ?? '').toLowerCase())
@@ -59,7 +123,6 @@ export function QuickApplyModal({ jobs, onApplied, onClose }: QuickApplyModalPro
         </DialogHeader>
 
         {done ? (
-          /* Done state */
           <div className="py-6 flex flex-col items-center text-center gap-3">
             <CheckCircle2 className="h-10 w-10 text-emerald-500" />
             <div>
@@ -86,7 +149,6 @@ export function QuickApplyModal({ jobs, onApplied, onClose }: QuickApplyModalPro
             {/* Job card */}
             <div className="rounded-lg border border-zinc-200 p-4 space-y-2">
               <div className="flex items-start gap-2">
-                {/* Company avatar */}
                 <div className="h-8 w-8 rounded-md bg-zinc-100 border border-zinc-200 flex items-center justify-center shrink-0">
                   <span className="text-[12px] font-bold text-zinc-500">
                     {job.company.replace(/^the\s+/i, '').trim()[0]?.toUpperCase() ?? '?'}
@@ -117,6 +179,30 @@ export function QuickApplyModal({ jobs, onApplied, onClose }: QuickApplyModalPro
                   {job.description.slice(0, 280)}
                 </p>
               )}
+            </div>
+
+            {/* Quick generate PDF row */}
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                className="flex-1 gap-1.5 text-[12px] border-indigo-200 text-indigo-700 hover:bg-indigo-50"
+                onClick={handleCoverLetterPdf}
+                disabled={cvLoading || resumeLoading}
+              >
+                {cvLoading ? <Loader2 className="h-3 w-3 animate-spin" /> : <FileText className="h-3 w-3" />}
+                Cover Letter PDF
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                className="flex-1 gap-1.5 text-[12px] border-violet-200 text-violet-700 hover:bg-violet-50"
+                onClick={handleResumePdf}
+                disabled={cvLoading || resumeLoading}
+              >
+                {resumeLoading ? <Loader2 className="h-3 w-3 animate-spin" /> : <FileDown className="h-3 w-3" />}
+                Resume PDF
+              </Button>
             </div>
 
             {/* Actions */}
@@ -151,7 +237,6 @@ export function QuickApplyModal({ jobs, onApplied, onClose }: QuickApplyModalPro
               </div>
             </div>
 
-            {/* Remaining count hint */}
             {jobs.length - index - 1 > 0 && (
               <p className="text-[11px] text-center text-zinc-400">
                 {jobs.length - index - 1} more job{jobs.length - index - 1 !== 1 ? 's' : ''} in queue

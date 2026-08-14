@@ -1,7 +1,7 @@
 "use client"
 
-import { useRef } from "react"
-import { Search, Star, X, Play } from "lucide-react"
+import { useRef, useState } from "react"
+import { Search, Star, X, Play, SlidersHorizontal } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
   Select,
@@ -10,10 +10,18 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover"
+import { Slider } from "@/components/ui/slider"
 import { CopilotJob, JobStatus, STATUS_LABELS } from "@/types/copilot-job"
 import { cn } from "@/lib/utils"
 
 export type SortKey = 'newest' | 'match' | 'company' | 'applied'
+export type RemoteFilter = 'all' | 'remote' | 'onsite'
+export type SourceFilter = 'all' | 'ai_search' | 'manual' | 'url'
 
 export interface BoardFilters {
   search: string
@@ -21,6 +29,9 @@ export interface BoardFilters {
   favoritesOnly: boolean
   sort: SortKey
   sessionId: string | 'all'
+  minScore: number
+  remote: RemoteFilter
+  source: SourceFilter
 }
 
 export const DEFAULT_FILTERS: BoardFilters = {
@@ -29,6 +40,9 @@ export const DEFAULT_FILTERS: BoardFilters = {
   favoritesOnly: false,
   sort: 'newest',
   sessionId: 'all',
+  minScore: 0,
+  remote: 'all',
+  source: 'all',
 }
 
 export interface SearchSessionSummary {
@@ -56,6 +70,13 @@ const SORT_LABELS: Record<SortKey, string> = {
   applied: 'Applied date',
 }
 
+const SOURCE_LABELS: Record<SourceFilter, string> = {
+  all: 'All sources',
+  ai_search: 'AI Search',
+  manual: 'Manual',
+  url: 'From URL',
+}
+
 export function applyFilters(jobs: CopilotJob[], filters: BoardFilters): CopilotJob[] {
   let result = [...jobs]
 
@@ -78,6 +99,22 @@ export function applyFilters(jobs: CopilotJob[], filters: BoardFilters): Copilot
 
   if (filters.sessionId !== 'all') {
     result = result.filter(j => j.searchSessionId === filters.sessionId)
+  }
+
+  if (filters.minScore > 0) {
+    result = result.filter(j => (j.matchScore ?? 0) >= filters.minScore)
+  }
+
+  if (filters.remote !== 'all') {
+    result = result.filter(j => {
+      const loc = (j.location ?? '').toLowerCase()
+      const isRemote = loc.includes('remote')
+      return filters.remote === 'remote' ? isRemote : !isRemote
+    })
+  }
+
+  if (filters.source !== 'all') {
+    result = result.filter(j => j.source === filters.source)
   }
 
   switch (filters.sort) {
@@ -104,6 +141,19 @@ export function applyFilters(jobs: CopilotJob[], filters: BoardFilters): Copilot
   return result
 }
 
+const REMOTE_OPTIONS: { value: RemoteFilter; label: string }[] = [
+  { value: 'all', label: 'All' },
+  { value: 'remote', label: 'Remote' },
+  { value: 'onsite', label: 'On-site' },
+]
+
+const SOURCE_OPTIONS: { value: SourceFilter; label: string }[] = [
+  { value: 'all', label: 'All' },
+  { value: 'ai_search', label: 'AI Search' },
+  { value: 'manual', label: 'Manual' },
+  { value: 'url', label: 'From URL' },
+]
+
 export function JobBoardToolbar({
   filters,
   onChange,
@@ -117,7 +167,21 @@ export function JobBoardToolbar({
   const ref = (searchInputRef as React.RefObject<HTMLInputElement>) ?? internalRef
 
   const set = (partial: Partial<BoardFilters>) => onChange({ ...filters, ...partial })
-  const hasActiveFilter = filters.status !== 'all' || filters.favoritesOnly || filters.search.trim() || filters.sessionId !== 'all'
+
+  const advancedActiveCount = [
+    filters.minScore > 0,
+    filters.remote !== 'all',
+    filters.source !== 'all',
+  ].filter(Boolean).length
+
+  const hasActiveFilter =
+    filters.status !== 'all' ||
+    filters.favoritesOnly ||
+    filters.search.trim() ||
+    filters.sessionId !== 'all' ||
+    advancedActiveCount > 0
+
+  const clearAdvanced = () => set({ minScore: 0, remote: 'all', source: 'all' })
 
   return (
     <div className="border-b bg-white px-2 py-1.5 space-y-1.5">
@@ -164,6 +228,102 @@ export function JobBoardToolbar({
         >
           <Star className={cn("h-3.5 w-3.5", filters.favoritesOnly && "fill-amber-400")} />
         </button>
+
+        {/* Advanced filters popover */}
+        <Popover>
+          <PopoverTrigger asChild>
+            <button
+              title="Advanced filters"
+              className={cn(
+                "h-[30px] px-2 flex items-center gap-1 rounded-md border transition-colors text-[11px] font-medium shrink-0",
+                advancedActiveCount > 0
+                  ? "border-indigo-300 bg-indigo-50 text-indigo-700"
+                  : "border-zinc-200 text-zinc-500 hover:border-zinc-300",
+              )}
+            >
+              <SlidersHorizontal className="h-3 w-3" />
+              {advancedActiveCount > 0 && (
+                <span className="h-4 min-w-4 flex items-center justify-center rounded-full bg-indigo-600 text-white text-[10px] font-bold px-1">
+                  {advancedActiveCount}
+                </span>
+              )}
+            </button>
+          </PopoverTrigger>
+          <PopoverContent className="w-72 p-4 space-y-4" align="end">
+            <div className="flex items-center justify-between">
+              <p className="text-[13px] font-semibold text-zinc-800">Advanced filters</p>
+              {advancedActiveCount > 0 && (
+                <button onClick={clearAdvanced} className="text-[11px] text-zinc-400 hover:text-zinc-600 underline">
+                  Clear
+                </button>
+              )}
+            </div>
+
+            {/* Min match score */}
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <label className="text-[12px] font-medium text-zinc-700">Min match score</label>
+                <span className="text-[12px] font-semibold text-indigo-600 tabular-nums">
+                  {filters.minScore > 0 ? `≥ ${filters.minScore}%` : 'Any'}
+                </span>
+              </div>
+              <Slider
+                min={0}
+                max={90}
+                step={10}
+                value={[filters.minScore]}
+                onValueChange={([v]) => set({ minScore: v })}
+                className="py-1"
+              />
+              <div className="flex justify-between text-[10px] text-zinc-400">
+                <span>Any</span>
+                <span>90%+</span>
+              </div>
+            </div>
+
+            {/* Remote filter */}
+            <div className="space-y-2">
+              <label className="text-[12px] font-medium text-zinc-700">Work type</label>
+              <div className="flex gap-1.5">
+                {REMOTE_OPTIONS.map(opt => (
+                  <button
+                    key={opt.value}
+                    onClick={() => set({ remote: opt.value })}
+                    className={cn(
+                      "flex-1 h-7 rounded-md border text-[11px] font-medium transition-colors",
+                      filters.remote === opt.value
+                        ? "border-indigo-300 bg-indigo-50 text-indigo-700"
+                        : "border-zinc-200 text-zinc-500 hover:border-zinc-300 hover:bg-zinc-50",
+                    )}
+                  >
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Source filter */}
+            <div className="space-y-2">
+              <label className="text-[12px] font-medium text-zinc-700">Source</label>
+              <div className="grid grid-cols-2 gap-1.5">
+                {SOURCE_OPTIONS.map(opt => (
+                  <button
+                    key={opt.value}
+                    onClick={() => set({ source: opt.value })}
+                    className={cn(
+                      "h-7 rounded-md border text-[11px] font-medium transition-colors",
+                      filters.source === opt.value
+                        ? "border-indigo-300 bg-indigo-50 text-indigo-700"
+                        : "border-zinc-200 text-zinc-500 hover:border-zinc-300 hover:bg-zinc-50",
+                    )}
+                  >
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </PopoverContent>
+        </Popover>
       </div>
 
       {/* Filter chips row */}
@@ -236,13 +396,39 @@ export function JobBoardToolbar({
           </Select>
         )}
 
-        {/* Clear filters */}
+        {/* Active advanced filter pills */}
+        {filters.remote !== 'all' && (
+          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-indigo-50 border border-indigo-200 text-[11px] font-medium text-indigo-700">
+            {filters.remote === 'remote' ? 'Remote' : 'On-site'}
+            <button onClick={() => set({ remote: 'all' })} className="hover:text-indigo-900">
+              <X className="h-2.5 w-2.5" />
+            </button>
+          </span>
+        )}
+        {filters.source !== 'all' && (
+          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-indigo-50 border border-indigo-200 text-[11px] font-medium text-indigo-700">
+            {SOURCE_LABELS[filters.source]}
+            <button onClick={() => set({ source: 'all' })} className="hover:text-indigo-900">
+              <X className="h-2.5 w-2.5" />
+            </button>
+          </span>
+        )}
+        {filters.minScore > 0 && (
+          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-indigo-50 border border-indigo-200 text-[11px] font-medium text-indigo-700">
+            ≥{filters.minScore}% match
+            <button onClick={() => set({ minScore: 0 })} className="hover:text-indigo-900">
+              <X className="h-2.5 w-2.5" />
+            </button>
+          </span>
+        )}
+
+        {/* Clear all filters */}
         {hasActiveFilter && (
           <button
             onClick={() => onChange({ ...DEFAULT_FILTERS, sort: filters.sort })}
             className="text-[11px] text-zinc-400 hover:text-zinc-600 underline flex items-center gap-0.5"
           >
-            <X className="h-2.5 w-2.5" /> Clear
+            <X className="h-2.5 w-2.5" /> Clear all
           </button>
         )}
 

@@ -16,6 +16,7 @@ import { AiSearchLoader } from "@/components/ai-search-loader"
 import { JobBoardToolbar, BoardFilters, DEFAULT_FILTERS, applyFilters, SearchSessionSummary } from "@/components/job-board-toolbar"
 import { QuickApplyModal } from "@/components/quick-apply-modal"
 import { ShortcutsHelp } from "@/components/shortcuts-help"
+import { SettingsPanel } from "@/components/settings-panel"
 import { PipelineChart } from "@/components/pipeline-chart"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { cn } from "@/lib/utils"
@@ -1424,41 +1425,18 @@ export default function WorkspacePage() {
 
         {/* ── SETTINGS ──────────────────────────────────────────────────── */}
         {currentView === 'settings' && (
-          <div className="flex-1 p-4 md:p-8 overflow-auto pb-16 md:pb-0">
-            <h2 className="text-xl font-bold tracking-tight mb-6">Settings</h2>
-            <div className="space-y-4 max-w-xl">
-              <div className="p-5 border rounded-lg bg-white">
-                <h3 className="font-semibold text-[14px]">Notifications</h3>
-                <p className="text-[13px] text-zinc-400 mt-1">Manage alerts for new jobs and application updates.</p>
-                <Button variant="outline" size="sm" className="mt-3 rounded-lg">Configure</Button>
-              </div>
-              <div className="p-5 border rounded-lg bg-white">
-                <h3 className="font-semibold text-[14px]">API Keys &amp; Integrations</h3>
-                <p className="text-[13px] text-zinc-400 mt-1">Connect job boards and external services.</p>
-                <Button variant="outline" size="sm" className="mt-3 rounded-lg">Manage Keys</Button>
-              </div>
-              <div className="p-5 border border-red-100 rounded-lg bg-white">
-                <h3 className="font-semibold text-[14px] text-red-600">Danger Zone</h3>
-                <p className="text-[13px] text-zinc-400 mt-1">Clear all workspace data from local storage.</p>
-                <Button
-                  variant="destructive"
-                  size="sm"
-                  className="mt-3 rounded-lg"
-                  onClick={() => {
-                    if (confirm('Clear all jobs from your workspace? This cannot be undone.')) {
-                      localStorage.removeItem('goosejobs_copilot_v1')
-                      localStorage.removeItem('gj_onboarded')
-                      setJobs([])
-                      setSelectedId(null)
-                      window.location.href = '/onboarding'
-                    }
-                  }}
-                >
-                  Clear Workspace &amp; Re-onboard
-                </Button>
-              </div>
-            </div>
-          </div>
+          <SettingsPanel
+            jobs={jobs}
+            onClearWorkspace={() => {
+              if (confirm('Clear all jobs from your workspace? This cannot be undone.')) {
+                localStorage.removeItem('goosejobs_copilot_v1')
+                localStorage.removeItem('gj_onboarded')
+                setJobs([])
+                setSelectedId(null)
+                window.location.href = '/onboarding'
+              }
+            }}
+          />
         )}
 
         {/* ── INTERVIEWS (coming soon) ───────────────────────────────────── */}
