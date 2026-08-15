@@ -704,11 +704,35 @@ function OverviewTab({ job, onUpdate }: { job: CopilotJob; onUpdate: (u: Partial
         </div>
       )}
 
+      {/* Connections + Contact row */}
+      <div className="grid grid-cols-2 gap-3">
+        <div>
+          <h3 className="text-[11px] font-semibold text-zinc-400 uppercase tracking-wider mb-2">Connections</h3>
+          <Input
+            placeholder="Anyone you know there?"
+            className="text-[12px] h-8"
+            value={job.connections ?? ""}
+            onChange={e => onUpdate({ connections: e.target.value || undefined })}
+          />
+          <p className="text-[10px] text-zinc-400 mt-1">Name, LinkedIn, or email of an insider</p>
+        </div>
+        <div>
+          <h3 className="text-[11px] font-semibold text-zinc-400 uppercase tracking-wider mb-2">Contact</h3>
+          <Input
+            placeholder="Recruiter or hiring manager"
+            className="text-[12px] h-8"
+            value={job.contact ?? ""}
+            onChange={e => onUpdate({ contact: e.target.value || undefined })}
+          />
+          <p className="text-[10px] text-zinc-400 mt-1">Name and email/LinkedIn of point of contact</p>
+        </div>
+      </div>
+
       {/* Notes */}
       <div>
         <h3 className="text-[11px] font-semibold text-zinc-400 uppercase tracking-wider mb-2">Notes</h3>
         <Textarea
-          placeholder="Recruiter name, interview date, referral contact, anything relevant…"
+          placeholder="Interview date, referral details, anything relevant…"
           className="text-[13px] resize-none min-h-[100px] leading-relaxed"
           value={job.notes}
           onChange={e => onUpdate({ notes: e.target.value })}

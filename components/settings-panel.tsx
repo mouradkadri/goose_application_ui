@@ -11,7 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { CopilotJob } from "@/types/copilot-job"
+import { CopilotJob, STATUS_LABELS } from "@/types/copilot-job"
 import { Download, Trash2, Save, MapPin, CheckCircle2 } from "lucide-react"
 import { cn } from "@/lib/utils"
 
@@ -56,25 +56,27 @@ export function SettingsPanel({ jobs, onClearWorkspace }: SettingsPanelProps) {
 
   const exportExcel = async () => {
     const XLSX = await import("xlsx")
-    const cols: (keyof CopilotJob)[] = [
-      "title", "company", "location", "status", "salary",
-      "matchScore", "source", "addedAt", "appliedAt", "applyUrl", "notes",
-    ]
-    const HEADERS: Record<string, string> = {
-      title: "Job Title", company: "Company", location: "Location",
-      status: "Status", salary: "Salary", matchScore: "Match Score (%)",
-      source: "Source", addedAt: "Added", appliedAt: "Applied",
-      applyUrl: "Apply URL", notes: "Notes",
-    }
-    const rows = jobs.map(j =>
-      Object.fromEntries(cols.map(k => {
-        const v = j[k]
-        return [HEADERS[k], v == null ? "" : v]
-      }))
-    )
+    const fmtDate = (iso?: string) => iso ? iso.slice(0, 10) : ""
+    const rows = jobs.map(j => ({
+      "Job Title":        j.title,
+      "Company":          j.company,
+      "Location":         j.location,
+      "Status":           STATUS_LABELS[j.status] ?? j.status,
+      "Salary":           j.salary ?? "",
+      "Match Score (%)":  j.matchScore ?? "",
+      "Source":           j.source,
+      "Date Added":       fmtDate(j.addedAt),
+      "Date Applied":     fmtDate(j.appliedAt),
+      "Follow-up Date":   fmtDate(j.followUpAt),
+      "Connections":      j.connections ?? "",
+      "Contact":          j.contact ?? "",
+      "Cover Letter":     j.aiContent?.coverLetter ? "Yes" : "No",
+      "Starred":          j.favorite ? "★" : "",
+      "Apply URL":        j.applyUrl,
+      "Notes":            j.notes,
+    }))
     const ws = XLSX.utils.json_to_sheet(rows)
-    // Column widths
-    ws["!cols"] = [28, 22, 20, 14, 18, 14, 12, 14, 14, 40, 30].map(w => ({ wch: w }))
+    ws["!cols"] = [28,22,20,14,16,14,12,12,12,12,28,28,12,8,40,36].map(w => ({ wch: w }))
     const wb = XLSX.utils.book_new()
     XLSX.utils.book_append_sheet(wb, ws, "Jobs")
     XLSX.writeFile(wb, `goosejobs-${today()}.xlsx`)

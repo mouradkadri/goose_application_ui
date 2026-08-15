@@ -110,6 +110,10 @@ export interface CopilotJob {
   followUpAt?: string;
   /** ID of the AI search session that surfaced this job. */
   searchSessionId?: string;
+  /** Someone you know at this company (name, LinkedIn, email). */
+  connections?: string;
+  /** Recruiter or hiring manager contact info. */
+  contact?: string;
   matchScore?: number;
   aiContent: {
     coverLetter?: string;
