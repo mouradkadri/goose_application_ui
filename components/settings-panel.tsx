@@ -11,8 +11,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { CopilotJob, STATUS_LABELS } from "@/types/copilot-job"
-import { Download, Trash2, Save, MapPin, CheckCircle2 } from "lucide-react"
+import { CopilotJob, STATUS_LABELS, REJECTION_REASON_LABELS } from "@/types/copilot-job"
+import { searchSessions } from "@/lib/search-sessions"
+import { Download, Trash2, Save, MapPin, CheckCircle2, Target } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 type WorkStyle = "Remote" | "Hybrid" | "On-site" | "Open to all"
@@ -39,11 +40,17 @@ interface SettingsPanelProps {
 export function SettingsPanel({ jobs, onClearWorkspace }: SettingsPanelProps) {
   const [prefs, setPrefs] = useState<Prefs | null>(null)
   const [savedPrefs, setSavedPrefs] = useState(false)
+  const [weeklyGoal, setWeeklyGoal] = useState(10)
+  const [goalSaved, setGoalSaved] = useState(false)
+  const [exportSessionId, setExportSessionId] = useState<string>('all')
+  const sessions = searchSessions.getAll()
 
   useEffect(() => {
     try {
       const stored = localStorage.getItem("gj_onboarded")
       if (stored) setPrefs(JSON.parse(stored) as Prefs)
+      const goal = localStorage.getItem("gj_weekly_goal")
+      if (goal) setWeeklyGoal(Number(goal))
     } catch { /* ignore */ }
   }, [])
 
@@ -54,36 +61,63 @@ export function SettingsPanel({ jobs, onClearWorkspace }: SettingsPanelProps) {
     setTimeout(() => setSavedPrefs(false), 2000)
   }
 
+  const saveGoal = () => {
+    localStorage.setItem("gj_weekly_goal", String(weeklyGoal))
+    setGoalSaved(true)
+    setTimeout(() => setGoalSaved(false), 2000)
+  }
+
+  const filteredForExport = (jobList: CopilotJob[]) =>
+    exportSessionId === 'all' ? jobList : jobList.filter(j => j.searchSessionId === exportSessionId)
+
+  const buildRows = (jobList: CopilotJob[]) => {
+    const fmtDate = (iso?: string) => iso ? iso.slice(0, 10) : ""
+    return jobList.map(j => ({
+      "Job Title":         j.title,
+      "Company":           j.company,
+      "Location":          j.location,
+      "Status":            STATUS_LABELS[j.status] ?? j.status,
+      "Salary":            j.salary ?? "",
+      "Match Score (%)":   j.matchScore ?? "",
+      "Source":            j.source,
+      "Date Added":        fmtDate(j.addedAt),
+      "Date Applied":      fmtDate(j.appliedAt),
+      "Deadline":          fmtDate(j.deadline),
+      "Follow-up Date":    fmtDate(j.followUpAt),
+      "Rejection Reason":  j.rejectionReason ? (REJECTION_REASON_LABELS[j.rejectionReason] ?? j.rejectionReason) : "",
+      "Connections":       j.connections ?? "",
+      "Contact":           j.contact ?? "",
+      "Cover Letter":      j.aiContent?.coverLetter ? "Yes" : "No",
+      "Starred":           j.favorite ? "★" : "",
+      "Apply URL":         j.applyUrl,
+      "Notes":             j.notes,
+    }))
+  }
+
   const exportExcel = async () => {
     const XLSX = await import("xlsx")
-    const fmtDate = (iso?: string) => iso ? iso.slice(0, 10) : ""
-    const rows = jobs.map(j => ({
-      "Job Title":        j.title,
-      "Company":          j.company,
-      "Location":         j.location,
-      "Status":           STATUS_LABELS[j.status] ?? j.status,
-      "Salary":           j.salary ?? "",
-      "Match Score (%)":  j.matchScore ?? "",
-      "Source":           j.source,
-      "Date Added":       fmtDate(j.addedAt),
-      "Date Applied":     fmtDate(j.appliedAt),
-      "Follow-up Date":   fmtDate(j.followUpAt),
-      "Connections":      j.connections ?? "",
-      "Contact":          j.contact ?? "",
-      "Cover Letter":     j.aiContent?.coverLetter ? "Yes" : "No",
-      "Starred":          j.favorite ? "★" : "",
-      "Apply URL":        j.applyUrl,
-      "Notes":            j.notes,
-    }))
+    const rows = buildRows(filteredForExport(jobs))
     const ws = XLSX.utils.json_to_sheet(rows)
-    ws["!cols"] = [28,22,20,14,16,14,12,12,12,12,28,28,12,8,40,36].map(w => ({ wch: w }))
+    ws["!cols"] = [28,22,20,14,16,14,12,12,12,12,12,18,28,28,12,8,40,36].map(w => ({ wch: w }))
     const wb = XLSX.utils.book_new()
     XLSX.utils.book_append_sheet(wb, ws, "Jobs")
     XLSX.writeFile(wb, `goosejobs-${today()}.xlsx`)
   }
 
+  const exportCsv = () => {
+    const rows = buildRows(filteredForExport(jobs))
+    if (rows.length === 0) return
+    const headers = Object.keys(rows[0])
+    const csvRows = [
+      headers.map(h => `"${h}"`).join(","),
+      ...rows.map(row => Object.values(row).map(v => `"${String(v).replace(/"/g, '""')}"`).join(","))
+    ]
+    const blob = new Blob([csvRows.join("\n")], { type: "text/csv;charset=utf-8;" })
+    triggerDownload(blob, `goosejobs-${today()}.csv`)
+  }
+
   const exportJson = () => {
-    const blob = new Blob([JSON.stringify(jobs, null, 2)], { type: "application/json" })
+    const blob = new Blob([JSON.stringify(filteredForExport(jobs), null, 2)], { type: "application/json" })
     triggerDownload(blob, `goosejobs-${today()}.json`)
   }
 
@@ -169,26 +203,56 @@ export function SettingsPanel({ jobs, onClearWorkspace }: SettingsPanelProps) {
           )}
         </Section>
 
+        {/* ── Weekly Application Goal ─────────────────────────────────── */}
+        <Section title="Weekly Application Goal" description="Set a target to keep your job search consistent.">
+          <Field label="Applications per week">
+            <div className="flex items-center gap-2">
+              <Target className="h-4 w-4 text-indigo-400 shrink-0" />
+              <Input
+                type="number"
+                min={1}
+                max={100}
+                value={weeklyGoal}
+                onChange={e => setWeeklyGoal(Math.max(1, Number(e.target.value)))}
+                className="h-8 text-[12px] w-24"
+              />
+              <Button
+                size="sm"
+                className={cn("gap-1.5 text-[12px] transition-all", goalSaved ? "bg-emerald-600 hover:bg-emerald-600 text-white" : "bg-indigo-600 hover:bg-indigo-700 text-white")}
+                onClick={saveGoal}
+              >
+                {goalSaved ? <><CheckCircle2 className="h-3.5 w-3.5" /> Saved!</> : <><Save className="h-3.5 w-3.5" /> Save</>}
+              </Button>
+            </div>
+          </Field>
+        </Section>
+
         {/* ── Export Data ──────────────────────────────────────────────── */}
         <Section title="Export Data" description={`${jobs.length} job${jobs.length !== 1 ? "s" : ""} in your workspace.`}>
+          {sessions.length > 1 && (
+            <Field label="Export scope">
+              <Select value={exportSessionId} onValueChange={setExportSessionId}>
+                <SelectTrigger className="h-8 text-[12px]"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all" className="text-[12px]">All jobs ({jobs.length})</SelectItem>
+                  {sessions.map(s => (
+                    <SelectItem key={s.id} value={s.id} className="text-[12px]">
+                      {s.resumeName.replace(/\.[^.]+$/, '')} — {new Date(s.startedAt).toLocaleDateString()} ({s.jobCount} jobs)
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </Field>
+          )}
           <div className="flex gap-2 flex-wrap">
-            <Button
-              variant="outline"
-              size="sm"
-              className="gap-1.5 text-[12px] border-emerald-200 text-emerald-700 hover:bg-emerald-50"
-              onClick={exportExcel}
-              disabled={jobs.length === 0}
-            >
-              <Download className="h-3.5 w-3.5" /> Export Excel (.xlsx)
+            <Button variant="outline" size="sm" className="gap-1.5 text-[12px] border-emerald-200 text-emerald-700 hover:bg-emerald-50" onClick={exportExcel} disabled={jobs.length === 0}>
+              <Download className="h-3.5 w-3.5" /> Excel (.xlsx)
             </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              className="gap-1.5 text-[12px]"
-              onClick={exportJson}
-              disabled={jobs.length === 0}
-            >
-              <Download className="h-3.5 w-3.5" /> Export JSON
+            <Button variant="outline" size="sm" className="gap-1.5 text-[12px] border-blue-200 text-blue-700 hover:bg-blue-50" onClick={exportCsv} disabled={jobs.length === 0}>
+              <Download className="h-3.5 w-3.5" /> CSV
+            </Button>
+            <Button variant="outline" size="sm" className="gap-1.5 text-[12px]" onClick={exportJson} disabled={jobs.length === 0}>
+              <Download className="h-3.5 w-3.5" /> JSON
             </Button>
           </div>
           {jobs.length === 0 && (

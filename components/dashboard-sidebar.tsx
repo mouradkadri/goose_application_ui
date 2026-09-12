@@ -3,17 +3,17 @@
 import { useState } from "react"
 import {
   LayoutDashboard, Briefcase, Send, Calendar, FileText,
-  Settings, Star, Keyboard,
+  Settings, Star, Keyboard, Compass,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 // ── Mobile bottom nav (shown only on < md) ────────────────────────────────────
 const MOBILE_NAV = [
-  { id: "home",         label: "Home",    icon: LayoutDashboard },
-  { id: "jobs",         label: "Jobs",    icon: Briefcase       },
-  { id: "applications", label: "Apply",   icon: Send            },
-  { id: "resumes",      label: "Resumes", icon: FileText        },
-  { id: "settings",     label: "More",    icon: Settings        },
+  { id: "home",         label: "Home",     icon: LayoutDashboard },
+  { id: "jobs",         label: "Jobs",     icon: Briefcase       },
+  { id: "applications", label: "Apply",    icon: Send            },
+  { id: "discover",     label: "Discover", icon: Compass         },
+  { id: "settings",     label: "More",     icon: Settings        },
 ] as const
 
 export function MobileBottomNav({
@@ -50,7 +50,7 @@ export function MobileBottomNav({
   )
 }
 
-export type ViewType = "home" | "jobs" | "applications" | "interviews" | "resumes" | "settings"
+export type ViewType = "home" | "jobs" | "applications" | "interviews" | "resumes" | "discover" | "settings"
 
 export interface FavoriteJob {
   id: string
@@ -78,6 +78,7 @@ const NAV = [
   { id: "applications", label: "Applications", icon: Send            },
   { id: "interviews",   label: "Interviews",   icon: Calendar        },
   { id: "resumes",      label: "Resumes",      icon: FileText        },
+  { id: "discover",     label: "Discover",     icon: Compass         },
 ] as const
 
 const FOOTER_NAV = [
@@ -108,7 +109,7 @@ export function DashboardSidebar({
       <div className="h-[60px] flex items-center border-b border-sidebar-border shrink-0 px-2.5">
         <div className="flex items-center gap-2.5 min-w-0">
           <img
-            src="/goose_job_logo.png"
+            src="/goose.gif"
             width={40}
             height={40}
             alt="GooseJobs"

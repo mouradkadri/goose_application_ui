@@ -19,9 +19,9 @@ export async function POST(req: NextRequest) {
   const res = NextResponse.json({ ok: true, redirectTo })
   res.cookies.set('gj_access', CODE, {
     httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
     sameSite: 'lax',
     path: '/',
-    // 30-day session
     maxAge: 60 * 60 * 24 * 30,
   })
   return res

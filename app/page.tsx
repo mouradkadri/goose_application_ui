@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback, useMemo } from "react"
 import { Button } from "@/components/ui/button"
-import { Plus, Search, BriefcaseBusiness, Brain, Lock, MapPin, CheckSquare, Square, FileText, Mail, X, CheckCircle2, Star, Trash2, AlertTriangle, ChevronDown, ChevronLeft, Loader2, TrendingUp, Clock, Zap, Copy, Eye, Award, Target, Activity, Send, RotateCcw } from "lucide-react"
+import { Plus, Search, BriefcaseBusiness, Brain, Lock, MapPin, CheckSquare, Square, FileText, Mail, X, CheckCircle2, Star, Trash2, AlertTriangle, ChevronDown, ChevronLeft, Loader2, TrendingUp, Clock, Zap, Copy, Eye, Award, Target, Activity, Send, RotateCcw, LayoutGrid, List, GripVertical, Timer } from "lucide-react"
 import { CopilotJob, JobStatus, STATUS_COLORS, STATUS_LABELS, getMatchTier, MATCH_TIER_COLORS } from "@/types/copilot-job"
 import { copilotStore, RawApiJob as StoreRawApiJob } from "@/lib/copilot-store"
 import { searchSessions, SearchSession } from "@/lib/search-sessions"
@@ -13,10 +13,11 @@ import { JobCopilotPanel } from "@/components/job-copilot-panel"
 import { AddJobModal } from "@/components/add-job-modal"
 import { DashboardSidebar, MobileBottomNav, ViewType } from "@/components/dashboard-sidebar"
 import { AiSearchLoader } from "@/components/ai-search-loader"
-import { JobBoardToolbar, BoardFilters, DEFAULT_FILTERS, applyFilters, SearchSessionSummary } from "@/components/job-board-toolbar"
+import { JobBoardToolbar, BoardFilters, DEFAULT_FILTERS, applyFilters, SearchSessionSummary, SortKey } from "@/components/job-board-toolbar"
 import { QuickApplyModal } from "@/components/quick-apply-modal"
 import { ShortcutsHelp } from "@/components/shortcuts-help"
 import { SettingsPanel } from "@/components/settings-panel"
+import { DiscoverPanel } from "@/components/discover-panel"
 import { PipelineChart } from "@/components/pipeline-chart"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { cn } from "@/lib/utils"
@@ -118,6 +119,19 @@ export default function WorkspacePage() {
   // Search session history (read from localStorage on mount, updated after each search)
   const [sessions, setSessions] = useState<SearchSession[]>([])
 
+  // Applications view filter/sort state
+  const [appSearch, setAppSearch] = useState('')
+  const [appSort, setAppSort] = useState<SortKey>('newest')
+  const [appFavOnly, setAppFavOnly] = useState(false)
+  const [appViewMode, setAppViewMode] = useState<'list' | 'kanban'>('list')
+
+  // Kanban drag state
+  const [draggingId, setDraggingId] = useState<string | null>(null)
+  const [dragOverStatus, setDragOverStatus] = useState<string | null>(null)
+
+  // Weekly goal (from localStorage)
+  const [weeklyGoal, setWeeklyGoal] = useState<number>(10)
+
   // Global search state from provider
   const { status, mode, logs, jobCount, error, firstJobId, startSearch, goBackground, dismiss } = useSearch()
   const isSearchRunning = status !== 'idle'
@@ -133,6 +147,9 @@ export default function WorkspacePage() {
 
     // Load search session history
     setSessions(searchSessions.getAll())
+
+    // Load weekly goal
+    try { const g = localStorage.getItem('gj_weekly_goal'); if (g) setWeeklyGoal(Number(g)) } catch { /* ignore */ }
 
     // Show localStorage jobs immediately — eliminates the blank flash on refresh
     const stored = copilotStore.getAll()
@@ -387,6 +404,13 @@ export default function WorkspacePage() {
   // ── Filtered + sorted job list for board ─────────────────────────────────
 
   const visibleJobs = useMemo(() => applyFilters(jobs, boardFilters), [jobs, boardFilters])
+
+  const filteredAppJobs = useMemo(() => applyFilters(jobs, {
+    ...DEFAULT_FILTERS,
+    search: appSearch,
+    sort: appSort,
+    favoritesOnly: appFavOnly,
+  }), [jobs, appSearch, appSort, appFavOnly])
 
   // Load more from server
   const handleLoadMore = useCallback(async () => {
@@ -1086,6 +1110,33 @@ export default function WorkspacePage() {
                 ))}
               </div>
 
+              {/* Weekly goal progress */}
+              {weeklyGoal > 0 && (
+                <div className="border rounded-xl bg-white p-4">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-2">
+                      <Target className="h-4 w-4 text-indigo-500" />
+                      <h3 className="text-[13px] font-semibold text-zinc-800">Weekly Goal</h3>
+                    </div>
+                    <span className="text-[12px] font-semibold text-zinc-600 tabular-nums">
+                      {appliedThisWeek} / {weeklyGoal} applications
+                    </span>
+                  </div>
+                  <div className="h-2.5 w-full rounded-full bg-zinc-100 overflow-hidden">
+                    <div
+                      className={cn("h-full rounded-full transition-all duration-500",
+                        appliedThisWeek >= weeklyGoal ? "bg-emerald-500" : "bg-indigo-500")}
+                      style={{ width: `${Math.min((appliedThisWeek / weeklyGoal) * 100, 100)}%` }}
+                    />
+                  </div>
+                  <p className="text-[11px] text-zinc-400 mt-1.5">
+                    {appliedThisWeek >= weeklyGoal
+                      ? "Goal reached this week!"
+                      : `${weeklyGoal - appliedThisWeek} more to hit your goal`}
+                  </p>
+                </div>
+              )}
+
               {/* Velocity + Pipeline row */}
               <div className="grid md:grid-cols-2 gap-4">
                 {/* Application velocity */}
@@ -1301,15 +1352,30 @@ export default function WorkspacePage() {
                       {jobs.length > 0 ? `${jobs.length} jobs tracked · ${appliedCount} applied` : 'Track every application from here'}
                     </p>
                   </div>
-                  {toApplyCount > 0 && (
-                    <Button
-                      size="sm"
-                      className="gap-1.5 h-8 text-[12px] bg-indigo-600 hover:bg-indigo-700 text-white"
-                      onClick={() => { setCurrentView('jobs'); setShowQuickApply(quickApplyQueue.length > 0) }}
-                    >
-                      <Zap className="h-3.5 w-3.5" /> Start applying ({toApplyCount})
+                  <div className="flex gap-2 items-center">
+                    {/* List / Kanban toggle */}
+                    <div className="flex items-center rounded-lg border border-zinc-200 bg-zinc-50 p-0.5">
+                      <button onClick={() => setAppViewMode('list')} title="List view"
+                        className={cn("h-7 px-2 rounded-md text-[11px] font-medium flex items-center gap-1 transition-colors",
+                          appViewMode === 'list' ? "bg-white shadow-sm text-zinc-800" : "text-zinc-400 hover:text-zinc-600")}>
+                        <List className="h-3.5 w-3.5" /> List
+                      </button>
+                      <button onClick={() => setAppViewMode('kanban')} title="Kanban board"
+                        className={cn("h-7 px-2 rounded-md text-[11px] font-medium flex items-center gap-1 transition-colors",
+                          appViewMode === 'kanban' ? "bg-white shadow-sm text-zinc-800" : "text-zinc-400 hover:text-zinc-600")}>
+                        <LayoutGrid className="h-3.5 w-3.5" /> Board
+                      </button>
+                    </div>
+                    <Button size="sm" variant="outline" className="gap-1.5 h-8 text-[12px]" onClick={() => setShowAddModal(true)}>
+                      <Plus className="h-3.5 w-3.5" /> Add Job
                     </Button>
-                  )}
+                    {toApplyCount > 0 && (
+                      <Button size="sm" className="gap-1.5 h-8 text-[12px] bg-indigo-600 hover:bg-indigo-700 text-white"
+                        onClick={() => { setCurrentView('jobs'); setShowQuickApply(quickApplyQueue.length > 0) }}>
+                        <Zap className="h-3.5 w-3.5" /> Start applying ({toApplyCount})
+                      </Button>
+                    )}
+                  </div>
                 </div>
 
                 {jobs.length === 0 ? (
@@ -1318,10 +1384,15 @@ export default function WorkspacePage() {
                       <Send className="h-8 w-8 text-zinc-200" aria-hidden />
                     </div>
                     <h3 className="font-semibold text-zinc-600 text-[15px]">No applications yet</h3>
-                    <p className="text-[13px] text-zinc-400 mt-1 max-w-xs">Add jobs from My Jobs and apply to start tracking your progress here.</p>
-                    <Button size="sm" className="mt-5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white gap-1.5" onClick={() => setCurrentView('jobs')}>
-                      <Plus className="h-3.5 w-3.5" /> Add your first job
-                    </Button>
+                    <p className="text-[13px] text-zinc-400 mt-1 max-w-xs">Add jobs manually, paste a URL, or let AI search find matches from your resume.</p>
+                    <div className="flex gap-2 mt-5">
+                      <Button size="sm" variant="outline" className="rounded-lg gap-1.5" onClick={() => setShowAddModal(true)}>
+                        <Plus className="h-3.5 w-3.5" /> Add Manually
+                      </Button>
+                      <Button size="sm" className="rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white gap-1.5" onClick={() => { setCurrentView('jobs'); setTimeout(() => fileInputRef.current?.click(), 100) }}>
+                        <Search className="h-3.5 w-3.5" /> Find with AI
+                      </Button>
+                    </div>
                   </div>
                 ) : (
                   <>
@@ -1342,10 +1413,137 @@ export default function WorkspacePage() {
                       />
                     </div>
 
-                    {/* Status groups */}
-                    <div className="space-y-6">
+                    {/* Applications filter bar */}
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <div className="relative flex-1 min-w-[160px] max-w-sm">
+                        <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-zinc-400 pointer-events-none" />
+                        <input
+                          type="text"
+                          placeholder="Search applications…"
+                          value={appSearch}
+                          onChange={e => setAppSearch(e.target.value)}
+                          className="w-full pl-8 pr-3 py-1.5 text-[12px] rounded-lg bg-white border border-zinc-200 outline-none focus:border-indigo-300 focus:ring-1 focus:ring-indigo-200 placeholder:text-zinc-400"
+                        />
+                        {appSearch && (
+                          <button onClick={() => setAppSearch('')} className="absolute right-2 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600">
+                            <X className="h-3 w-3" />
+                          </button>
+                        )}
+                      </div>
+                      <Select value={appSort} onValueChange={v => setAppSort(v as SortKey)}>
+                        <SelectTrigger className="h-8 w-[130px] text-[12px] border-zinc-200 bg-white shrink-0">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent className="text-[12px]">
+                          <SelectItem value="newest" className="text-[12px]">Newest first</SelectItem>
+                          <SelectItem value="match" className="text-[12px]">Best match</SelectItem>
+                          <SelectItem value="company" className="text-[12px]">Company A–Z</SelectItem>
+                          <SelectItem value="applied" className="text-[12px]">Applied date</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <button
+                        onClick={() => setAppFavOnly(f => !f)}
+                        aria-pressed={appFavOnly}
+                        title="Favorites only"
+                        className={cn(
+                          "h-8 w-8 flex items-center justify-center rounded-lg border shrink-0 transition-colors",
+                          appFavOnly ? "border-amber-300 bg-amber-50 text-amber-500" : "border-zinc-200 bg-white text-zinc-400 hover:text-amber-400",
+                        )}
+                      >
+                        <Star className={cn("h-4 w-4", appFavOnly && "fill-amber-400")} />
+                      </button>
+                      {(appSearch || appSort !== 'newest' || appFavOnly) && (
+                        <>
+                          <button
+                            onClick={() => { setAppSearch(''); setAppSort('newest'); setAppFavOnly(false) }}
+                            className="h-8 px-2.5 rounded-lg border border-zinc-200 bg-white text-[11px] text-zinc-500 hover:text-zinc-800 flex items-center gap-1 shrink-0"
+                          >
+                            <X className="h-3 w-3" /> Clear
+                          </button>
+                          <span className="text-[11px] text-zinc-400 ml-auto tabular-nums">
+                            {filteredAppJobs.length} of {jobs.length}
+                          </span>
+                        </>
+                      )}
+                    </div>
+
+                    {/* Kanban board view */}
+                    {appViewMode === 'kanban' && (() => {
+                      const KANBAN_COLS: { status: JobStatus | 'closed'; label: string; statuses: JobStatus[]; headerBg: string; headerText: string; headerBorder: string }[] = [
+                        { status: 'to_apply',  label: 'To Apply',     statuses: ['to_apply'],           headerBg: 'bg-zinc-50',    headerText: 'text-zinc-600',    headerBorder: 'border-zinc-200' },
+                        { status: 'applied',   label: 'Applied',      statuses: ['applied'],            headerBg: 'bg-blue-50',    headerText: 'text-blue-700',    headerBorder: 'border-blue-200' },
+                        { status: 'interview', label: 'Interviewing', statuses: ['interview'],          headerBg: 'bg-amber-50',   headerText: 'text-amber-700',   headerBorder: 'border-amber-200' },
+                        { status: 'offer',     label: 'Offer',        statuses: ['offer'],              headerBg: 'bg-emerald-50', headerText: 'text-emerald-700', headerBorder: 'border-emerald-200' },
+                        { status: 'closed',    label: 'Closed',       statuses: ['rejected','ghosted'], headerBg: 'bg-red-50/60',  headerText: 'text-red-600',     headerBorder: 'border-red-100' },
+                      ]
+                      return (
+                        <div className="flex gap-3 overflow-x-auto pb-4" style={{ minHeight: '400px' }}>
+                          {KANBAN_COLS.map(col => {
+                            const colJobs = filteredAppJobs.filter(j => col.statuses.includes(j.status as JobStatus))
+                            const isDragTarget = col.statuses.includes(dragOverStatus as JobStatus)
+                            return (
+                              <div key={col.status}
+                                className={cn("flex flex-col rounded-xl border min-w-[220px] w-[220px] shrink-0 transition-colors", col.headerBg, col.headerBorder,
+                                  isDragTarget && "ring-2 ring-indigo-400 ring-offset-1")}
+                                onDragOver={e => { e.preventDefault(); setDragOverStatus(col.statuses[0]) }}
+                                onDragLeave={() => setDragOverStatus(null)}
+                                onDrop={e => {
+                                  e.preventDefault()
+                                  if (draggingId && col.statuses[0] !== 'rejected') {
+                                    const newStatus = col.statuses[0] as JobStatus
+                                    const extra: Record<string, unknown> = {}
+                                    if (newStatus === 'applied') extra.appliedAt = new Date().toISOString()
+                                    copilotStore.update(draggingId, { status: newStatus, ...extra })
+                                    refreshJobs()
+                                  }
+                                  setDraggingId(null); setDragOverStatus(null)
+                                }}
+                              >
+                                <div className={cn("flex items-center gap-2 px-3 py-2.5 rounded-t-xl border-b", col.headerBorder)}>
+                                  <span className={cn("text-[11px] font-bold uppercase tracking-wider", col.headerText)}>{col.label}</span>
+                                  <span className={cn("text-[10px] font-semibold px-1.5 py-0.5 rounded-md border ml-auto", col.headerBg, col.headerText, col.headerBorder)}>{colJobs.length}</span>
+                                </div>
+                                <div className="flex-1 p-2 space-y-2 overflow-y-auto">
+                                  {colJobs.map(j => (
+                                    <div key={j.id} draggable
+                                      onDragStart={() => setDraggingId(j.id)}
+                                      onDragEnd={() => { setDraggingId(null); setDragOverStatus(null) }}
+                                      onClick={() => { setSelectedId(j.id); setCurrentView('jobs') }}
+                                      className={cn("bg-white border border-zinc-200 rounded-lg p-2.5 cursor-grab active:cursor-grabbing hover:shadow-sm transition-shadow group",
+                                        draggingId === j.id && "opacity-40")}
+                                    >
+                                      <div className="flex items-start gap-1.5">
+                                        <GripVertical className="h-3.5 w-3.5 text-zinc-300 shrink-0 mt-0.5 group-hover:text-zinc-400" />
+                                        <div className="min-w-0 flex-1">
+                                          <p className="text-[12px] font-semibold text-zinc-900 leading-snug line-clamp-2">{j.title}</p>
+                                          <p className="text-[11px] text-zinc-400 mt-0.5 truncate">{j.company}</p>
+                                        </div>
+                                        {j.favorite && <Star className="h-3 w-3 text-amber-400 fill-amber-400 shrink-0 mt-0.5" />}
+                                      </div>
+                                      {j.matchScore !== undefined && (
+                                        <div className="mt-1.5 flex justify-end">
+                                          <MatchTierBadge score={j.matchScore} />
+                                        </div>
+                                      )}
+                                    </div>
+                                  ))}
+                                  {colJobs.length === 0 && (
+                                    <div className="h-16 flex items-center justify-center">
+                                      <p className="text-[11px] text-zinc-300">Drop here</p>
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+                            )
+                          })}
+                        </div>
+                      )
+                    })()}
+
+                    {/* Status groups — list view */}
+                    {appViewMode === 'list' && <div className="space-y-6">
                       {PIPELINE.map(({ status, label, dotColor, headerBg, headerText, headerBorder }) => {
-                        const group = jobs.filter(j => j.status === status)
+                        const group = filteredAppJobs.filter(j => j.status === status)
                         if (group.length === 0) return null
                         return (
                           <div key={status}>
@@ -1356,10 +1554,8 @@ export default function WorkspacePage() {
                                 {group.length}
                               </span>
                               {status === 'to_apply' && group.length > 0 && (
-                                <button
-                                  className="ml-auto text-[11px] text-indigo-500 hover:text-indigo-700 font-medium"
-                                  onClick={() => { setCurrentView('jobs'); setShowQuickApply(true) }}
-                                >
+                                <button className="ml-auto text-[11px] text-indigo-500 hover:text-indigo-700 font-medium"
+                                  onClick={() => { setCurrentView('jobs'); setShowQuickApply(true) }}>
                                   Start applying →
                                 </button>
                               )}
@@ -1367,13 +1563,19 @@ export default function WorkspacePage() {
                             <div className="grid gap-2.5 sm:grid-cols-2 lg:grid-cols-3">
                               {group.map(j => {
                                 const isOverdue = j.followUpAt && j.followUpAt <= today
+                                const isDeadlineSoon = j.deadline && j.deadline >= today && j.deadline <= new Date(Date.now() + 3 * 864e5).toISOString().slice(0,10)
+                                const isDeadlinePassed = j.deadline && j.deadline < today
+                                const daysSinceApplied = j.appliedAt
+                                  ? Math.floor((Date.now() - new Date(j.appliedAt).getTime()) / 864e5)
+                                  : null
+                                const isSlowResponse = daysSinceApplied !== null && daysSinceApplied >= 7 && ['applied'].includes(j.status)
                                 return (
-                                  <button
-                                    key={j.id}
+                                  <button key={j.id}
                                     className={cn(
                                       "border rounded-xl p-3.5 bg-white text-left transition-all group",
                                       "hover:shadow-md hover:border-zinc-300 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-indigo-400",
                                       isOverdue && "ring-1 ring-amber-300 border-amber-200",
+                                      isDeadlinePassed && "ring-1 ring-red-200 border-red-200",
                                     )}
                                     onClick={() => { setSelectedId(j.id); setCurrentView('jobs') }}
                                   >
@@ -1396,9 +1598,31 @@ export default function WorkspacePage() {
                                           ✓ {new Date(j.appliedAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
                                         </span>
                                       )}
+                                      {daysSinceApplied !== null && (
+                                        <span className={cn("inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded border",
+                                          isSlowResponse ? "bg-orange-50 border-orange-200 text-orange-600 font-medium" : "bg-zinc-50 border-zinc-100 text-zinc-400")}>
+                                          <Timer className="h-2.5 w-2.5" />
+                                          {daysSinceApplied}d{isSlowResponse ? ' — chase up?' : ''}
+                                        </span>
+                                      )}
+                                      {isDeadlineSoon && (
+                                        <span className="inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded bg-red-50 border border-red-200 text-red-600 font-medium">
+                                          ⏳ Deadline {new Date(j.deadline!).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+                                        </span>
+                                      )}
+                                      {isDeadlinePassed && (
+                                        <span className="inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded bg-red-50 border border-red-200 text-red-500">
+                                          Deadline passed
+                                        </span>
+                                      )}
                                       {isOverdue && (
                                         <span className="inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded bg-amber-50 border border-amber-200 text-amber-600 font-medium">
                                           ⏰ Follow-up due
+                                        </span>
+                                      )}
+                                      {j.rejectionReason && (
+                                        <span className="inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded bg-zinc-50 border border-zinc-200 text-zinc-400">
+                                          {j.rejectionReason.replace('_',' ')}
                                         </span>
                                       )}
                                       {j.aiContent?.coverLetter && (
@@ -1415,13 +1639,49 @@ export default function WorkspacePage() {
                           </div>
                         )
                       })}
-                    </div>
+                      {filteredAppJobs.length === 0 && (appSearch || appFavOnly) && (
+                        <div className="text-center py-12">
+                          <p className="text-[13px] text-zinc-400">No applications match your search.</p>
+                          <button
+                            className="mt-2 text-[12px] text-indigo-600 hover:text-indigo-700 underline"
+                            onClick={() => { setAppSearch(''); setAppFavOnly(false) }}
+                          >
+                            Clear filters
+                          </button>
+                        </div>
+                      )}
+                    </div>}
                   </>
                 )}
               </div>
             </div>
           )
         })()}
+
+        {/* ── DISCOVER ──────────────────────────────────────────────────── */}
+        {currentView === 'discover' && (
+          <DiscoverPanel
+            onTrackJob={(partial) => {
+              const newJob = copilotStore.add({
+                title: partial.title ?? 'Untitled',
+                company: partial.company ?? '',
+                location: partial.location ?? '',
+                salary: partial.salary ?? '',
+                description: partial.description ?? '',
+                applyUrl: partial.applyUrl ?? '',
+                source: 'url',
+                status: 'to_apply',
+                notes: '',
+                favorite: false,
+                aiContent: {},
+                requirements: [],
+              })
+              setJobs(copilotStore.getAll())
+              setSelectedId(newJob.id)
+              setCurrentView('jobs')
+            }}
+          />
+        )}
 
         {/* ── SETTINGS ──────────────────────────────────────────────────── */}
         {currentView === 'settings' && (

@@ -89,6 +89,34 @@ export interface ResumeDocument {
 
 // ─────────────────────────────────────────────────────────────────────────────
 
+export type RejectionReason = 'no_response' | 'skills' | 'salary' | 'overqualified' | 'withdrew' | 'other';
+
+export const REJECTION_REASON_LABELS: Record<RejectionReason, string> = {
+  no_response:  'No response',
+  skills:       'Skills mismatch',
+  salary:       'Salary mismatch',
+  overqualified:'Overqualified',
+  withdrew:     'I withdrew',
+  other:        'Other',
+};
+
+export interface ChecklistItem {
+  id: string;
+  text: string;
+  done: boolean;
+}
+
+export const DEFAULT_INTERVIEW_CHECKLIST: string[] = [
+  'Research the company (news, products, culture)',
+  'Re-read the job description carefully',
+  'Prepare your "Tell me about yourself"',
+  'Prepare 3 questions to ask the interviewer',
+  'Research the interviewers on LinkedIn',
+  'Practice common technical / role-specific questions',
+  'Prepare your salary expectations',
+  'Set up interview environment (camera, lighting, quiet)',
+];
+
 export interface CopilotJob {
   id: string;
   title: string;
@@ -108,12 +136,18 @@ export interface CopilotJob {
   appliedAt?: string;
   /** ISO date string (YYYY-MM-DD) for a user-set follow-up reminder/deadline. */
   followUpAt?: string;
+  /** ISO date string (YYYY-MM-DD) for the application submission deadline. */
+  deadline?: string;
   /** ID of the AI search session that surfaced this job. */
   searchSessionId?: string;
   /** Someone you know at this company (name, LinkedIn, email). */
   connections?: string;
   /** Recruiter or hiring manager contact info. */
   contact?: string;
+  /** Why this application was rejected or closed. */
+  rejectionReason?: RejectionReason;
+  /** Interview prep checklist items. Auto-populated when status → interview. */
+  interviewChecklist?: ChecklistItem[];
   matchScore?: number;
   aiContent: {
     coverLetter?: string;

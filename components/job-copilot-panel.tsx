@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect, useMemo } from "react"
-import { CopilotJob, ResumeDocument, JobStatus, STATUS_LABELS, STATUS_COLORS, STATUS_TEXT, getMatchTier, MATCH_TIER_COLORS } from "@/types/copilot-job"
+import { CopilotJob, ResumeDocument, JobStatus, STATUS_LABELS, STATUS_COLORS, STATUS_TEXT, getMatchTier, MATCH_TIER_COLORS, RejectionReason, REJECTION_REASON_LABELS, ChecklistItem, DEFAULT_INTERVIEW_CHECKLIST } from "@/types/copilot-job"
 import { copilotStore } from "@/lib/copilot-store"
 import { buildResumeTex, buildCoverLetterTex, downloadText, downloadBlob, safeFilename } from "@/lib/doc-export"
 import { renderResumePdf, renderCoverLetterPdf } from "@/lib/doc-export-pdf"
@@ -573,7 +573,13 @@ function OverviewTab({ job, onUpdate }: { job: CopilotJob; onUpdate: (u: Partial
           <span className="text-[11px] font-semibold text-zinc-400 uppercase tracking-wider">Status</span>
           <Select value={job.status} onValueChange={v => {
             const status = v as JobStatus
-            const extra = status === 'applied' && !job.appliedAt ? { appliedAt: new Date().toISOString() } : {}
+            const extra: Partial<CopilotJob> = {}
+            if (status === 'applied' && !job.appliedAt) extra.appliedAt = new Date().toISOString()
+            if (status === 'interview' && (!job.interviewChecklist || job.interviewChecklist.length === 0)) {
+              extra.interviewChecklist = DEFAULT_INTERVIEW_CHECKLIST.map((text, i) => ({
+                id: `cl-${Date.now()}-${i}`, text, done: false,
+              }))
+            }
             onUpdate({ status, ...extra })
           }}>
             <SelectTrigger className="h-8 text-[13px] w-36">
@@ -606,34 +612,128 @@ function OverviewTab({ job, onUpdate }: { job: CopilotJob; onUpdate: (u: Partial
         )}
       </div>
 
-      {/* Follow-up date */}
-      <div className="flex items-center gap-3">
-        <div className="flex items-center gap-2">
-          <Calendar className={cn("h-3.5 w-3.5 shrink-0", followUpDue ? "text-amber-500" : "text-zinc-400")} />
-          <span className={cn("text-[11px] font-semibold uppercase tracking-wider", followUpDue ? "text-amber-600" : "text-zinc-400")}>
-            Follow-up{followUpDue ? ' — due!' : ''}
-          </span>
-        </div>
-        <Input
-          type="date"
-          value={job.followUpAt ?? ''}
-          onChange={e => onUpdate({ followUpAt: e.target.value || undefined })}
-          className={cn(
-            "h-7 text-[12px] w-36",
-            followUpDue && "border-amber-300 bg-amber-50 text-amber-700",
+      {/* Dates row: follow-up + deadline */}
+      <div className="flex flex-wrap gap-x-6 gap-y-2">
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
+            <Calendar className={cn("h-3.5 w-3.5 shrink-0", followUpDue ? "text-amber-500" : "text-zinc-400")} />
+            <span className={cn("text-[11px] font-semibold uppercase tracking-wider", followUpDue ? "text-amber-600" : "text-zinc-400")}>
+              Follow-up{followUpDue ? ' — due!' : ''}
+            </span>
+          </div>
+          <Input
+            type="date"
+            value={job.followUpAt ?? ''}
+            onChange={e => onUpdate({ followUpAt: e.target.value || undefined })}
+            className={cn("h-7 text-[12px] w-36", followUpDue && "border-amber-300 bg-amber-50 text-amber-700")}
+            aria-label="Follow-up reminder date"
+          />
+          {job.followUpAt && (
+            <button onClick={() => onUpdate({ followUpAt: undefined })} className="text-zinc-400 hover:text-zinc-600" aria-label="Clear follow-up">
+              <X className="h-3 w-3" />
+            </button>
           )}
-          aria-label="Follow-up reminder date"
-        />
-        {job.followUpAt && (
-          <button
-            onClick={() => onUpdate({ followUpAt: undefined })}
-            className="text-zinc-400 hover:text-zinc-600"
-            aria-label="Clear follow-up date"
-          >
-            <X className="h-3 w-3" />
-          </button>
-        )}
+        </div>
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
+            <Calendar className={cn("h-3.5 w-3.5 shrink-0", job.deadline && job.deadline < new Date().toISOString().slice(0,10) ? "text-red-400" : "text-zinc-400")} />
+            <span className={cn("text-[11px] font-semibold uppercase tracking-wider", job.deadline && job.deadline < new Date().toISOString().slice(0,10) ? "text-red-500" : "text-zinc-400")}>
+              Deadline{job.deadline && job.deadline < new Date().toISOString().slice(0,10) ? ' — passed!' : ''}
+            </span>
+          </div>
+          <Input
+            type="date"
+            value={job.deadline ?? ''}
+            onChange={e => onUpdate({ deadline: e.target.value || undefined })}
+            className={cn("h-7 text-[12px] w-36", job.deadline && job.deadline < new Date().toISOString().slice(0,10) && "border-red-200 bg-red-50 text-red-600")}
+            aria-label="Application deadline"
+          />
+          {job.deadline && (
+            <button onClick={() => onUpdate({ deadline: undefined })} className="text-zinc-400 hover:text-zinc-600" aria-label="Clear deadline">
+              <X className="h-3 w-3" />
+            </button>
+          )}
+        </div>
       </div>
+
+      {/* Company quick-links */}
+      <div className="flex items-center gap-2 flex-wrap">
+        <span className="text-[11px] font-semibold text-zinc-400 uppercase tracking-wider">Research</span>
+        {[
+          { label: 'Glassdoor', href: `https://www.glassdoor.com/Search/results.htm?keyword=${encodeURIComponent(job.company)}` },
+          { label: 'LinkedIn', href: `https://www.linkedin.com/company/${encodeURIComponent(job.company.toLowerCase().replace(/\s+/g,'-'))}` },
+          { label: 'Crunchbase', href: `https://www.crunchbase.com/textsearch?q=${encodeURIComponent(job.company)}` },
+        ].map(({ label, href }) => (
+          <a key={label} href={href} target="_blank" rel="noopener noreferrer"
+            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md border border-zinc-200 bg-zinc-50 hover:bg-white hover:border-zinc-300 text-[11px] font-medium text-zinc-600 transition-colors">
+            <ExternalLink className="h-2.5 w-2.5" /> {label}
+          </a>
+        ))}
+      </div>
+
+      {/* Rejection reason — visible when status is rejected or ghosted */}
+      {(job.status === 'rejected' || job.status === 'ghosted') && (
+        <div className="rounded-lg border border-red-100 bg-red-50/40 p-3 space-y-2">
+          <p className="text-[11px] font-semibold text-red-500 uppercase tracking-wider">Rejection reason</p>
+          <div className="flex flex-wrap gap-1.5">
+            {(Object.entries(REJECTION_REASON_LABELS) as [RejectionReason, string][]).map(([k, v]) => (
+              <button key={k} onClick={() => onUpdate({ rejectionReason: job.rejectionReason === k ? undefined : k })}
+                className={cn(
+                  "px-2.5 py-1 rounded-md border text-[11px] font-medium transition-colors",
+                  job.rejectionReason === k
+                    ? "border-red-400 bg-red-100 text-red-700"
+                    : "border-zinc-200 bg-white text-zinc-500 hover:border-zinc-300",
+                )}>
+                {v}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Interview checklist — visible when status is interview */}
+      {job.status === 'interview' && (
+        <div className="rounded-lg border border-amber-200 bg-amber-50/30 p-4 space-y-3">
+          <div className="flex items-center justify-between">
+            <p className="text-[11px] font-semibold text-amber-700 uppercase tracking-wider">Interview prep checklist</p>
+            <span className="text-[11px] text-amber-500 tabular-nums">
+              {(job.interviewChecklist ?? []).filter(i => i.done).length}/{(job.interviewChecklist ?? []).length}
+            </span>
+          </div>
+          {(!job.interviewChecklist || job.interviewChecklist.length === 0) && (
+            <button
+              onClick={() => onUpdate({ interviewChecklist: DEFAULT_INTERVIEW_CHECKLIST.map((text, i) => ({ id: `cl-${Date.now()}-${i}`, text, done: false })) })}
+              className="text-[12px] text-amber-600 underline"
+            >
+              Generate prep checklist
+            </button>
+          )}
+          <div className="space-y-1.5">
+            {(job.interviewChecklist ?? []).map((item: ChecklistItem) => (
+              <button key={item.id}
+                onClick={() => {
+                  const updated = (job.interviewChecklist ?? []).map((c: ChecklistItem) =>
+                    c.id === item.id ? { ...c, done: !c.done } : c
+                  )
+                  onUpdate({ interviewChecklist: updated })
+                }}
+                className="w-full flex items-center gap-2.5 p-2 rounded-md hover:bg-amber-50 transition-colors text-left"
+              >
+                <div className={cn("h-4 w-4 rounded border-2 flex items-center justify-center shrink-0 transition-colors",
+                  item.done ? "bg-amber-500 border-amber-500" : "border-zinc-300 bg-white")}>
+                  {item.done && <Check className="h-2.5 w-2.5 text-white" />}
+                </div>
+                <span className={cn("text-[12px] leading-snug", item.done ? "line-through text-zinc-400" : "text-zinc-700")}>
+                  {item.text}
+                </span>
+              </button>
+            ))}
+          </div>
+          {(job.interviewChecklist ?? []).filter((i: ChecklistItem) => i.done).length === (job.interviewChecklist ?? []).length && (job.interviewChecklist ?? []).length > 0 && (
+            <p className="text-[11px] text-amber-600 font-medium text-center pt-1">All done — good luck! 🎯</p>
+          )}
+        </div>
+      )}
 
       {/* Job description */}
       {job.description ? (
@@ -791,7 +891,9 @@ function ResumeTab({ job, masterResume, masterResumeText, onAiContent, onUploadR
   const [docError, setDocError] = useState<string | null>(null)
 
   const suggestions: Array<{ original: string; reason: string; rewritten: string }> =
-    (job.aiContent.tailoredResume as unknown as typeof suggestions) ?? []
+    Array.isArray(job.aiContent.tailoredResume)
+      ? (job.aiContent.tailoredResume as unknown as typeof suggestions)
+      : []
 
   const resumeDoc = job.aiContent.resumeDocument ?? null
 
@@ -1194,14 +1296,46 @@ function CompanyTab({ job }: { job: CopilotJob }) {
 }
 
 // ── TAB: OUTREACH ─────────────────────────────────────────────────────────────
-function OutreachTab({ job }: { job: CopilotJob }) {
+function OutreachTab({ job, masterResumeText, onAiContent, onUploadResume }: {
+  job: CopilotJob
+  masterResumeText: string | null
+  onAiContent: (c: Partial<CopilotJob['aiContent']>) => void
+  onUploadResume?: () => void
+}) {
   const [mode, setMode] = useState<'email' | 'linkedin'>('email')
+  const { state, error, generate } = useGenerate('/api/generate/outreach/', job, masterResumeText)
+
+  // Gate: outreach quality depends on having real job description + company
+  const hasProperInfo = !!(job.company?.trim() && job.description?.trim().length > 150)
+
+  const emailData = useMemo(() => {
+    try {
+      return job.aiContent.outreachEmail
+        ? JSON.parse(job.aiContent.outreachEmail) as { subject: string; email: string }
+        : null
+    } catch { return null }
+  }, [job.aiContent.outreachEmail])
+
+  const linkedinText = job.aiContent.linkedinMessage ?? ''
+  const hasContent = !!emailData || !!linkedinText
+
+  const handleGenerate = async () => {
+    const data = await generate()
+    if (!data) return
+    if (data.subject !== undefined || data.email !== undefined)
+      onAiContent({ outreachEmail: JSON.stringify({ subject: data.subject ?? '', email: data.email ?? '' }) })
+    if (data.linkedin) onAiContent({ linkedinMessage: data.linkedin as string })
+  }
+
   return (
     <div className="space-y-5 max-w-3xl">
       <div>
         <h3 className="font-semibold text-sm">Outreach</h3>
-        <p className="text-sm text-muted-foreground mt-1">Cold email or LinkedIn note to a recruiter at {job.company}.</p>
+        <p className="text-sm text-muted-foreground mt-1">
+          Cold email and LinkedIn note to a recruiter at {job.company}. Both generated in one shot.
+        </p>
       </div>
+
       <div className="flex gap-2">
         <Button size="sm" variant={mode === 'email' ? 'default' : 'outline'} onClick={() => setMode('email')}>
           <Mail className="h-3.5 w-3.5 mr-1.5" /> Cold Email
@@ -1210,14 +1344,64 @@ function OutreachTab({ job }: { job: CopilotJob }) {
           <Send className="h-3.5 w-3.5 mr-1.5" /> LinkedIn Note
         </Button>
       </div>
-      <ComingSoonBanner feature={mode === 'email' ? 'Cold Email Generator' : 'LinkedIn Message Generator'} />
-      <div className="border rounded-lg p-5 bg-zinc-50 opacity-50 pointer-events-none select-none">
-        {mode === 'email' ? (
-          <><p className="text-xs font-semibold text-zinc-400 uppercase mb-1">Subject</p><Skeleton className="h-4 w-64 mb-3" /><p className="text-xs font-semibold text-zinc-400 uppercase mb-1">Body</p><SkeletonContent lines={6} /></>
-        ) : (
-          <SkeletonContent lines={4} />
-        )}
-      </div>
+
+      {!masterResumeText && <NoResumeBanner onUpload={onUploadResume} />}
+      {error && <p className="text-xs text-red-500 p-3 border border-red-200 rounded-lg bg-red-50">{error}</p>}
+
+      {!hasProperInfo && (
+        <div className="flex items-start gap-3 p-4 rounded-lg bg-zinc-50 border border-zinc-200 text-sm text-zinc-500">
+          <Info className="h-4 w-4 mt-0.5 shrink-0 text-zinc-400" />
+          <span>
+            <span className="font-medium text-zinc-700">Not enough job info.</span>{" "}
+            This job is missing a description or company name — outreach generation needs both to produce a personalised message.
+            Edit the job to add a description first.
+          </span>
+        </div>
+      )}
+
+      {hasProperInfo && !hasContent ? (
+        <Button size="sm" variant="outline" className="gap-2"
+          disabled={state === 'loading' || !masterResumeText} onClick={handleGenerate}>
+          <Sparkles className={cn("h-3.5 w-3.5", state === 'loading' && "animate-pulse")} />
+          {state === 'loading' ? 'Generating…' : 'Generate Outreach Messages'}
+        </Button>
+      ) : hasProperInfo ? (
+        <div className="space-y-4">
+          {mode === 'email' && (emailData ? (
+            <>
+              <div className="rounded-lg border bg-zinc-50 p-4 space-y-2">
+                <p className="text-[11px] font-semibold uppercase tracking-wider text-zinc-400">Subject</p>
+                <p className="text-sm font-medium">{emailData.subject}</p>
+                <CopyButton text={emailData.subject} />
+              </div>
+              <div className="rounded-lg border bg-zinc-50 p-4 space-y-2">
+                <p className="text-[11px] font-semibold uppercase tracking-wider text-zinc-400">Body</p>
+                <pre className="text-sm text-foreground leading-relaxed whitespace-pre-wrap font-sans">{emailData.email}</pre>
+                <CopyButton text={emailData.email} />
+              </div>
+            </>
+          ) : <p className="text-sm text-zinc-400">Click regenerate to produce the cold email.</p>)}
+
+          {mode === 'linkedin' && (linkedinText ? (
+            <div className="rounded-lg border bg-zinc-50 p-4 space-y-2">
+              <div className="flex items-center justify-between">
+                <p className="text-[11px] font-semibold uppercase tracking-wider text-zinc-400">LinkedIn Note</p>
+                <span className={cn("text-[11px]", linkedinText.length > 280 ? "text-red-500 font-medium" : "text-zinc-400")}>
+                  {linkedinText.length}/300
+                </span>
+              </div>
+              <pre className="text-sm text-foreground leading-relaxed whitespace-pre-wrap font-sans">{linkedinText}</pre>
+              <CopyButton text={linkedinText} />
+            </div>
+          ) : <p className="text-sm text-zinc-400">Click regenerate to produce the LinkedIn note.</p>)}
+
+          <Button size="sm" variant="outline" className="gap-2"
+            disabled={state === 'loading' || !masterResumeText} onClick={handleGenerate}>
+            <RefreshCw className={cn("h-3.5 w-3.5", state === 'loading' && "animate-spin")} />
+            {state === 'loading' ? 'Regenerating…' : 'Regenerate Both'}
+          </Button>
+        </div>
+      ) : null}
     </div>
   )
 }
@@ -1282,7 +1466,7 @@ const TABS = [
   { id: 'interview', label: 'Interview',      icon: Users,      live: true  },
   { id: 'fit',       label: 'Fit Analysis',   icon: BarChart2,  live: true  },
   { id: 'company',   label: 'Company',        icon: Building2,  live: false },
-  { id: 'outreach',  label: 'Outreach',       icon: Send,       live: false },
+  { id: 'outreach',  label: 'Outreach',       icon: Send,       live: true  },
   { id: 'salary',    label: 'Salary',         icon: DollarSign, live: false },
   { id: 'skills',    label: 'Skills',         icon: Zap,        live: false },
 ] as const
@@ -1388,7 +1572,7 @@ export function JobCopilotPanel({ job, masterResume, masterResumeText, onUpdate,
           <TabsContent forceMount value="interview" className="mt-0 data-[state=inactive]:hidden"><InterviewTab   job={job} masterResumeText={masterResumeText} onAiContent={handleAiContent} onUploadResume={onUploadResume} /></TabsContent>
           <TabsContent forceMount value="fit"       className="mt-0 data-[state=inactive]:hidden"><FitTab         job={job} masterResumeText={masterResumeText} onAiContent={handleAiContent} onUploadResume={onUploadResume} /></TabsContent>
           <TabsContent forceMount value="company"   className="mt-0 data-[state=inactive]:hidden"><CompanyTab     job={job} /></TabsContent>
-          <TabsContent forceMount value="outreach"  className="mt-0 data-[state=inactive]:hidden"><OutreachTab    job={job} /></TabsContent>
+          <TabsContent forceMount value="outreach"  className="mt-0 data-[state=inactive]:hidden"><OutreachTab    job={job} masterResumeText={masterResumeText} onAiContent={handleAiContent} onUploadResume={onUploadResume} /></TabsContent>
           <TabsContent forceMount value="salary"    className="mt-0 data-[state=inactive]:hidden"><SalaryTab      job={job} /></TabsContent>
           <TabsContent forceMount value="skills"    className="mt-0 data-[state=inactive]:hidden"><SkillsTab      job={job} /></TabsContent>
         </div>
