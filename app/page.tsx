@@ -1673,7 +1673,6 @@ export default function WorkspacePage() {
                 status: 'to_apply',
                 notes: '',
                 favorite: false,
-                aiContent: {},
                 requirements: [],
               })
               setJobs(copilotStore.getAll())
