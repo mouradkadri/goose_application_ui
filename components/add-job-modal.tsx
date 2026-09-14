@@ -132,7 +132,7 @@ export function AddJobModal({ onClose, onAdd, onImportUrl }: AddJobModalProps) {
               </Button>
             </div>
             {isFetching && (
-              <p className="text-xs text-indigo-600 font-medium">Reading the posting…</p>
+              <p className="text-xs text-brand-600 font-medium">Reading the posting…</p>
             )}
             {fetchError && (
               <p className="text-xs text-red-600">

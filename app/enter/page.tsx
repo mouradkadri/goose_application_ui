@@ -4,6 +4,32 @@ import { useState, useRef, useEffect, Suspense } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { Loader2 } from "lucide-react"
 
+/** Signature: a small V-formation of geese — the migration/"in formation" motif. */
+function GooseFormation({ className = "" }: { className?: string }) {
+  // Lead bird at top-center, wings trailing down both sides.
+  const birds = [
+    { x: 60, y: 6, lead: true },
+    { x: 48, y: 14 }, { x: 72, y: 14 },
+    { x: 37, y: 22 }, { x: 83, y: 22 },
+    { x: 27, y: 30 }, { x: 93, y: 30 },
+  ]
+  return (
+    <svg viewBox="0 0 120 40" className={className} fill="none" aria-hidden="true">
+      {birds.map((b, i) => (
+        <path
+          key={i}
+          d={`M${b.x - 5} ${b.y + 3} L${b.x} ${b.y} L${b.x + 5} ${b.y + 3}`}
+          stroke="var(--amber)"
+          strokeWidth={b.lead ? 1.8 : 1.4}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          opacity={b.lead ? 1 : 0.55}
+        />
+      ))}
+    </svg>
+  )
+}
+
 function EnterForm() {
   const router = useRouter()
   const params = useSearchParams()
@@ -31,59 +57,51 @@ function EnterForm() {
       if (data.ok) {
         router.replace(data.redirectTo || from)
       } else {
-        setError(data.error || 'Invalid code')
+        setError(data.error || 'That code didn’t work. Check it and try again.')
         setCode('')
         inputRef.current?.focus()
       }
     } catch {
-      setError('Something went wrong. Try again.')
+      setError('Something went wrong on our end. Try again.')
     } finally {
       setLoading(false)
     }
   }
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="w-full max-w-sm bg-[#1a1510] border border-[#2a2018] rounded-2xl p-8 space-y-5 shadow-xl"
-    >
-      <div className="text-center space-y-1">
-        <h2 className="text-[15px] font-semibold text-[#f2e4cf]">Enter access code</h2>
-        <p className="text-[12px] text-[#9a8570] leading-relaxed">
-          This app is in private beta. Enter your access code to continue.
-        </p>
-      </div>
-
-      <div className="space-y-3">
+    <form onSubmit={handleSubmit} className="w-full max-w-[360px] space-y-4">
+      <div className="space-y-2">
+        <label htmlFor="access-code" className="fg-label block text-leather-ink-soft">
+          Access code
+        </label>
         <input
+          id="access-code"
           ref={inputRef}
           type="text"
           value={code}
           onChange={e => { setCode(e.target.value); setError('') }}
-          placeholder="Access code"
+          placeholder="•••• ••••"
           autoComplete="off"
           spellCheck={false}
           className={[
-            "w-full px-4 py-3 rounded-xl text-[14px] text-center tracking-widest font-mono",
-            "bg-[#0e0c09] border text-[#f2e4cf] placeholder:text-[#4a3f32] placeholder:tracking-normal placeholder:font-sans",
-            "outline-none transition-colors",
+            "w-full px-4 py-3 rounded-lg text-[15px] text-center tracking-[0.3em] fg-data",
+            "bg-[#0e0c09] border text-leather-ink placeholder:text-leather-ink-faint",
+            "outline-none transition-colors focus:ring-0",
             error
-              ? "border-red-500/60 focus:border-red-400"
-              : "border-[#2a2018] focus:border-amber-500/60",
+              ? "border-clay/70 focus:border-clay"
+              : "border-leather-line focus:border-brand-400",
           ].join(' ')}
           disabled={loading}
         />
-        {error && (
-          <p className="text-[12px] text-red-400 text-center">{error}</p>
-        )}
+        {error && <p className="text-[12px] text-clay/90">{error}</p>}
       </div>
 
       <button
         type="submit"
         disabled={!code.trim() || loading}
         className={[
-          "w-full py-3 rounded-xl text-[14px] font-semibold transition-all",
-          "bg-amber-500 hover:bg-amber-400 text-[#0e0c09]",
+          "w-full py-3 rounded-lg text-[14px] font-semibold transition-all",
+          "bg-amber text-[#13100a] hover:bg-brand-300",
           "disabled:opacity-40 disabled:cursor-not-allowed",
           "flex items-center justify-center gap-2",
         ].join(' ')}
@@ -97,28 +115,40 @@ function EnterForm() {
 
 export default function EnterPage() {
   return (
-    <div className="min-h-screen bg-[#13100a] flex flex-col items-center justify-center p-6">
-      {/* Goose logo */}
-      <div className="mb-8 flex flex-col items-center gap-3">
+    <div className="min-h-screen bg-leather flex flex-col items-center justify-center p-6 relative overflow-hidden">
+      {/* warm ambient glow */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0"
+        style={{ background: "radial-gradient(60% 50% at 50% 18%, rgba(232,147,58,0.10), transparent 70%)" }}
+      />
+
+      <div className="relative w-full max-w-[360px] flex flex-col items-center">
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/goose_job_logo.png" alt="GooseJobs" width={90} height={90} className="object-contain drop-shadow-lg" />
-        <div className="text-center">
-          <h1 className="text-[22px] font-bold text-[#f2e4cf] tracking-tight">GooseJobs</h1>
-          <p className="text-[13px] text-[#9a8570] mt-1">AI-powered job copilot</p>
-        </div>
+        <img src="/goose_job_logo.png" alt="" width={72} height={72} className="object-contain drop-shadow-lg" />
+
+        <GooseFormation className="w-24 h-8 mt-5" />
+
+        <p className="fg-label mt-5 text-brand-400/90">Private beta</p>
+        <h1 className="font-display text-[30px] font-extrabold text-leather-ink mt-2 tracking-tight">
+          GooseJobs
+        </h1>
+        <p className="text-[14px] text-leather-ink-soft mt-2 text-center leading-relaxed text-balance">
+          Your whole job hunt in formation — search, tailor, and track every application in one workspace.
+        </p>
+
+        <div className="w-full h-px bg-leather-line my-7" />
+
+        <Suspense fallback={
+          <div className="w-full max-w-[360px] flex items-center justify-center py-10">
+            <Loader2 className="h-5 w-5 animate-spin text-leather-ink-soft" />
+          </div>
+        }>
+          <EnterForm />
+        </Suspense>
+
+        <p className="fg-label mt-8 text-leather-ink-faint">GooseJobs · Private beta</p>
       </div>
-
-      <Suspense fallback={
-        <div className="w-full max-w-sm bg-[#1a1510] border border-[#2a2018] rounded-2xl p-8 flex items-center justify-center">
-          <Loader2 className="h-5 w-5 animate-spin text-[#9a8570]" />
-        </div>
-      }>
-        <EnterForm />
-      </Suspense>
-
-      <p className="mt-6 text-[11px] text-[#4a3f32]">
-        GooseJobs · Private Beta
-      </p>
     </div>
   )
 }

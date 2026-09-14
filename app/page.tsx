@@ -612,7 +612,7 @@ export default function WorkspacePage() {
                       aria-label={selectionMode ? "Exit selection mode" : "Select jobs for bulk actions"}
                       aria-pressed={selectionMode}
                       title={selectionMode ? "Exit selection (Esc)" : "Select multiple (x)"}
-                      className={cn("h-6 w-6", selectionMode ? "text-indigo-600 bg-indigo-50" : "text-zinc-400 hover:text-zinc-700")}
+                      className={cn("h-6 w-6", selectionMode ? "text-brand-600 bg-brand-50" : "text-zinc-400 hover:text-zinc-700")}
                       onClick={() => { setSelectionMode(m => !m); setSelectedIds(new Set()) }}
                     >
                       <CheckSquare className="h-3.5 w-3.5" />
@@ -673,7 +673,7 @@ export default function WorkspacePage() {
                   <div className="p-5 text-center mt-4">
                     <p className="text-[13px] text-zinc-400">No jobs match your filters.</p>
                     <button
-                      className="mt-2 text-[12px] text-indigo-600 hover:text-indigo-700 underline"
+                      className="mt-2 text-[12px] text-brand-600 hover:text-brand-700 underline"
                       onClick={() => setBoardFilters(DEFAULT_FILTERS)}
                     >
                       Clear filters
@@ -717,20 +717,20 @@ export default function WorkspacePage() {
                             aria-label={`${job.title} at ${job.company}`}
                             className={cn(
                               "w-full text-left px-3 py-2.5 transition-colors border-b border-zinc-100 last:border-0 cursor-pointer",
-                              "hover:bg-white focus-visible:outline-none focus-visible:bg-indigo-50/40",
+                              "hover:bg-white focus-visible:outline-none focus-visible:bg-brand-50/40",
                               selectionMode
                                 ? isChecked
-                                  ? "bg-indigo-50/60 border-l-2 border-l-indigo-400 pl-[10px]"
+                                  ? "bg-brand-50/60 border-l-2 border-l-brand-400 pl-[10px]"
                                   : "border-l-2 border-l-transparent"
                                 : isSelected
-                                  ? "bg-white border-l-2 border-l-indigo-500 pl-[10px]"
+                                  ? "bg-white border-l-2 border-l-brand-500 pl-[10px]"
                                   : "border-l-2 border-l-transparent",
                             )}
                           >
                             <div className="flex items-start gap-2">
                               {selectionMode ? (
                                 <div className="h-7 w-7 flex items-center justify-center shrink-0">
-                                  {isChecked ? <CheckSquare className="h-4 w-4 text-indigo-600" /> : <Square className="h-4 w-4 text-zinc-300" />}
+                                  {isChecked ? <CheckSquare className="h-4 w-4 text-brand-600" /> : <Square className="h-4 w-4 text-zinc-300" />}
                                 </div>
                               ) : (
                                 <CompanyAvatar company={job.company} />
@@ -796,9 +796,9 @@ export default function WorkspacePage() {
 
               {/* Bulk action bar — visible when in selection mode */}
               {selectionMode && (
-                <div className="border-t bg-indigo-50/60 px-3 py-2.5 shrink-0 space-y-2">
+                <div className="border-t bg-brand-50/60 px-3 py-2.5 shrink-0 space-y-2">
                   <div className="flex items-center justify-between">
-                    <span className="text-[12px] font-semibold text-indigo-700">
+                    <span className="text-[12px] font-semibold text-brand-700">
                       {selectedIds.size === 0 ? 'Select jobs above' : `${selectedIds.size} selected`}
                     </span>
                     {selectedIds.size > 0 && (
@@ -817,16 +817,16 @@ export default function WorkspacePage() {
                         {!masterResumeText && (
                           <p className="text-[11px] text-amber-600 w-full">Upload resume first to generate.</p>
                         )}
-                        <Button size="sm" disabled={!masterResumeText || !!bulkProgress} className="h-7 text-[11px] px-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-md gap-1" onClick={() => handleBulkGenerate('cover-letter')}>
+                        <Button size="sm" disabled={!masterResumeText || !!bulkProgress} className="h-7 text-[11px] px-2 bg-brand-600 hover:bg-brand-700 text-white rounded-md gap-1" onClick={() => handleBulkGenerate('cover-letter')}>
                           <Mail className="h-3 w-3" /> Cover Letters
                         </Button>
-                        <Button size="sm" disabled={!masterResumeText || !!bulkProgress} className="h-7 text-[11px] px-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-md gap-1" onClick={() => handleBulkGenerate('resume')}>
+                        <Button size="sm" disabled={!masterResumeText || !!bulkProgress} className="h-7 text-[11px] px-2 bg-brand-600 hover:bg-brand-700 text-white rounded-md gap-1" onClick={() => handleBulkGenerate('resume')}>
                           <FileText className="h-3 w-3" /> Resumes
                         </Button>
                         <Button size="sm" disabled={!masterResumeText || !!bulkProgress} variant="outline" className="h-7 text-[11px] px-2 rounded-md" onClick={() => handleBulkGenerate('both')}>Both</Button>
                       </div>
                       {/* Tracking actions */}
-                      <div className="flex gap-1.5 flex-wrap pt-1 border-t border-indigo-100">
+                      <div className="flex gap-1.5 flex-wrap pt-1 border-t border-brand-100">
                         {/* Bulk status */}
                         <Select onValueChange={v => handleBulkStatus(v as JobStatus)}>
                           <SelectTrigger className="h-7 text-[11px] w-28 px-2">
@@ -869,7 +869,7 @@ export default function WorkspacePage() {
                         <button
                           onClick={() => setEditingLocation(true)}
                           disabled={isSearchRunning}
-                          className="text-[10px] text-indigo-400 hover:text-indigo-600 shrink-0 font-medium disabled:opacity-40"
+                          className="text-[10px] text-brand-400 hover:text-brand-600 shrink-0 font-medium disabled:opacity-40"
                         >
                           Change
                         </button>
@@ -923,10 +923,10 @@ export default function WorkspacePage() {
                   className={cn(
                     "w-full flex items-center gap-2 px-3 py-2.5 rounded-lg text-[13px] font-semibold transition-all",
                     isSearchRunning
-                      ? "bg-indigo-50 border border-indigo-200 text-indigo-400 cursor-not-allowed"
+                      ? "bg-brand-50 border border-brand-200 text-brand-400 cursor-not-allowed"
                       : jobs.length === 0
-                        ? "bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm hover:shadow"
-                        : "border border-dashed border-zinc-200 text-zinc-500 hover:border-indigo-300 hover:text-indigo-600 hover:bg-indigo-50/30 focus-visible:outline-none",
+                        ? "bg-brand-600 hover:bg-brand-700 text-white shadow-sm hover:shadow"
+                        : "border border-dashed border-zinc-200 text-zinc-500 hover:border-brand-300 hover:text-brand-600 hover:bg-brand-50/30 focus-visible:outline-none",
                   )}
                 >
                   <Search className="h-3.5 w-3.5 shrink-0" aria-hidden />
@@ -937,7 +937,7 @@ export default function WorkspacePage() {
                 {resumeFile && !isSearchRunning && jobs.length > 0 && (
                   <button
                     onClick={() => startSearch(resumeFile, selectedLocation)}
-                    className="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-[11px] text-zinc-400 hover:text-indigo-600 hover:bg-indigo-50 transition-colors"
+                    className="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-[11px] text-zinc-400 hover:text-brand-600 hover:bg-brand-50 transition-colors"
                   >
                     <RotateCcw className="h-3 w-3 shrink-0" />
                     <span className="truncate">Re-run with {resumeFile.name.replace(/\.pdf$/i, '')}</span>
@@ -985,7 +985,7 @@ export default function WorkspacePage() {
                     </div>
                     <div className="w-48 h-1.5 rounded-full bg-zinc-100 overflow-hidden">
                       <div
-                        className="h-full rounded-full bg-indigo-500 transition-all duration-300"
+                        className="h-full rounded-full bg-brand-500 transition-all duration-300"
                         style={{ width: `${(bulkProgress.current / bulkProgress.total) * 100}%` }}
                       />
                     </div>
@@ -1038,7 +1038,7 @@ export default function WorkspacePage() {
                     <Button
                       size="sm"
                       onClick={() => setShowAddModal(true)}
-                      className="gap-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg h-9 text-[13px] font-semibold"
+                      className="gap-1.5 bg-brand-600 hover:bg-brand-700 text-white rounded-lg h-9 text-[13px] font-semibold"
                     >
                       <Plus className="h-3.5 w-3.5" /> Add Job
                     </Button>
@@ -1080,7 +1080,7 @@ export default function WorkspacePage() {
                   )}
                   <Button
                     size="sm"
-                    className="gap-1.5 h-8 text-[12px] bg-indigo-600 hover:bg-indigo-700 text-white"
+                    className="gap-1.5 h-8 text-[12px] bg-brand-600 hover:bg-brand-700 text-white"
                     onClick={() => { setCurrentView('jobs'); setTimeout(() => fileInputRef.current?.click(), 100) }}
                   >
                     <Search className="h-3.5 w-3.5" /> Find Jobs
@@ -1115,7 +1115,7 @@ export default function WorkspacePage() {
                 <div className="border rounded-xl bg-white p-4">
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center gap-2">
-                      <Target className="h-4 w-4 text-indigo-500" />
+                      <Target className="h-4 w-4 text-brand-500" />
                       <h3 className="text-[13px] font-semibold text-zinc-800">Weekly Goal</h3>
                     </div>
                     <span className="text-[12px] font-semibold text-zinc-600 tabular-nums">
@@ -1125,7 +1125,7 @@ export default function WorkspacePage() {
                   <div className="h-2.5 w-full rounded-full bg-zinc-100 overflow-hidden">
                     <div
                       className={cn("h-full rounded-full transition-all duration-500",
-                        appliedThisWeek >= weeklyGoal ? "bg-emerald-500" : "bg-indigo-500")}
+                        appliedThisWeek >= weeklyGoal ? "bg-emerald-500" : "bg-brand-500")}
                       style={{ width: `${Math.min((appliedThisWeek / weeklyGoal) * 100, 100)}%` }}
                     />
                   </div>
@@ -1142,13 +1142,13 @@ export default function WorkspacePage() {
                 {/* Application velocity */}
                 <div className="border rounded-xl bg-white p-4 space-y-3">
                   <div className="flex items-center gap-2">
-                    <TrendingUp className="h-4 w-4 text-indigo-500" />
+                    <TrendingUp className="h-4 w-4 text-brand-500" />
                     <h3 className="text-[13px] font-semibold text-zinc-800">Application Velocity</h3>
                   </div>
                   <div className="grid grid-cols-2 gap-3">
-                    <div className="rounded-lg bg-indigo-50 border border-indigo-100 p-3 text-center">
-                      <p className="text-2xl font-bold text-indigo-700 tabular-nums">{appliedToday}</p>
-                      <p className="text-[11px] text-indigo-400 mt-0.5">applied today</p>
+                    <div className="rounded-lg bg-brand-50 border border-brand-100 p-3 text-center">
+                      <p className="text-2xl font-bold text-brand-700 tabular-nums">{appliedToday}</p>
+                      <p className="text-[11px] text-brand-400 mt-0.5">applied today</p>
                     </div>
                     <div className="rounded-lg bg-zinc-50 border border-zinc-100 p-3 text-center">
                       <p className="text-2xl font-bold text-zinc-700 tabular-nums">{appliedThisWeek}</p>
@@ -1169,12 +1169,12 @@ export default function WorkspacePage() {
                 <div className="border rounded-xl bg-white p-4 space-y-3">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <Target className="h-4 w-4 text-indigo-500" />
+                      <Target className="h-4 w-4 text-brand-500" />
                       <h3 className="text-[13px] font-semibold text-zinc-800">Pipeline Funnel</h3>
                     </div>
                     {jobs.length > 0 && (
                       <button
-                        className="text-[11px] text-indigo-400 hover:text-indigo-600 font-medium"
+                        className="text-[11px] text-brand-400 hover:text-brand-600 font-medium"
                         onClick={() => setCurrentView('applications')}
                       >
                         Full view →
@@ -1235,14 +1235,14 @@ export default function WorkspacePage() {
                 {/* Recent applications */}
                 <div className="border rounded-xl bg-white p-4 space-y-3">
                   <div className="flex items-center gap-2">
-                    <Activity className="h-4 w-4 text-indigo-500" />
+                    <Activity className="h-4 w-4 text-brand-500" />
                     <h3 className="text-[13px] font-semibold text-zinc-800">Recent Applications</h3>
                   </div>
                   {recentApplied.length === 0 ? (
                     <div className="text-center py-6">
                       <p className="text-[12px] text-zinc-400">No applications yet.</p>
                       <button
-                        className="text-[12px] text-indigo-500 underline mt-1"
+                        className="text-[12px] text-brand-500 underline mt-1"
                         onClick={() => setCurrentView('jobs')}
                       >
                         Go to My Jobs →
@@ -1293,14 +1293,14 @@ export default function WorkspacePage() {
 
                   {/* AI content ready */}
                   {aiReadyCount > 0 && (
-                    <div className="border border-indigo-100 bg-indigo-50/40 rounded-xl p-4 flex items-start gap-3">
-                      <Award className="h-4 w-4 text-indigo-400 mt-0.5 shrink-0" />
+                    <div className="border border-brand-100 bg-brand-50/40 rounded-xl p-4 flex items-start gap-3">
+                      <Award className="h-4 w-4 text-brand-400 mt-0.5 shrink-0" />
                       <div className="flex-1 min-w-0">
                         <p className="text-[13px] font-semibold text-zinc-800">{aiReadyCount} resume{aiReadyCount !== 1 ? 's' : ''} / cover letter{aiReadyCount !== 1 ? 's' : ''} ready</p>
                         <p className="text-[11px] text-zinc-400 mt-0.5">AI-generated documents waiting to send.</p>
                       </div>
                       <button
-                        className="text-[11px] text-indigo-600 underline shrink-0"
+                        className="text-[11px] text-brand-600 underline shrink-0"
                         onClick={() => setCurrentView('resumes')}
                       >
                         View
@@ -1318,7 +1318,7 @@ export default function WorkspacePage() {
                       </div>
                       <Button
                         size="sm"
-                        className="gap-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg h-8 text-[12px]"
+                        className="gap-1.5 bg-brand-600 hover:bg-brand-700 text-white rounded-lg h-8 text-[12px]"
                         onClick={() => { setCurrentView('jobs'); setTimeout(() => fileInputRef.current?.click(), 100) }}
                       >
                         <Search className="h-3.5 w-3.5" /> Find Jobs with AI
@@ -1370,7 +1370,7 @@ export default function WorkspacePage() {
                       <Plus className="h-3.5 w-3.5" /> Add Job
                     </Button>
                     {toApplyCount > 0 && (
-                      <Button size="sm" className="gap-1.5 h-8 text-[12px] bg-indigo-600 hover:bg-indigo-700 text-white"
+                      <Button size="sm" className="gap-1.5 h-8 text-[12px] bg-brand-600 hover:bg-brand-700 text-white"
                         onClick={() => { setCurrentView('jobs'); setShowQuickApply(quickApplyQueue.length > 0) }}>
                         <Zap className="h-3.5 w-3.5" /> Start applying ({toApplyCount})
                       </Button>
@@ -1389,7 +1389,7 @@ export default function WorkspacePage() {
                       <Button size="sm" variant="outline" className="rounded-lg gap-1.5" onClick={() => setShowAddModal(true)}>
                         <Plus className="h-3.5 w-3.5" /> Add Manually
                       </Button>
-                      <Button size="sm" className="rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white gap-1.5" onClick={() => { setCurrentView('jobs'); setTimeout(() => fileInputRef.current?.click(), 100) }}>
+                      <Button size="sm" className="rounded-lg bg-brand-600 hover:bg-brand-700 text-white gap-1.5" onClick={() => { setCurrentView('jobs'); setTimeout(() => fileInputRef.current?.click(), 100) }}>
                         <Search className="h-3.5 w-3.5" /> Find with AI
                       </Button>
                     </div>
@@ -1422,7 +1422,7 @@ export default function WorkspacePage() {
                           placeholder="Search applications…"
                           value={appSearch}
                           onChange={e => setAppSearch(e.target.value)}
-                          className="w-full pl-8 pr-3 py-1.5 text-[12px] rounded-lg bg-white border border-zinc-200 outline-none focus:border-indigo-300 focus:ring-1 focus:ring-indigo-200 placeholder:text-zinc-400"
+                          className="w-full pl-8 pr-3 py-1.5 text-[12px] rounded-lg bg-white border border-zinc-200 outline-none focus:border-brand-300 focus:ring-1 focus:ring-brand-200 placeholder:text-zinc-400"
                         />
                         {appSearch && (
                           <button onClick={() => setAppSearch('')} className="absolute right-2 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600">
@@ -1484,7 +1484,7 @@ export default function WorkspacePage() {
                             return (
                               <div key={col.status}
                                 className={cn("flex flex-col rounded-xl border min-w-[220px] w-[220px] shrink-0 transition-colors", col.headerBg, col.headerBorder,
-                                  isDragTarget && "ring-2 ring-indigo-400 ring-offset-1")}
+                                  isDragTarget && "ring-2 ring-brand-400 ring-offset-1")}
                                 onDragOver={e => { e.preventDefault(); setDragOverStatus(col.statuses[0]) }}
                                 onDragLeave={() => setDragOverStatus(null)}
                                 onDrop={e => {
@@ -1554,7 +1554,7 @@ export default function WorkspacePage() {
                                 {group.length}
                               </span>
                               {status === 'to_apply' && group.length > 0 && (
-                                <button className="ml-auto text-[11px] text-indigo-500 hover:text-indigo-700 font-medium"
+                                <button className="ml-auto text-[11px] text-brand-500 hover:text-brand-700 font-medium"
                                   onClick={() => { setCurrentView('jobs'); setShowQuickApply(true) }}>
                                   Start applying →
                                 </button>
@@ -1573,7 +1573,7 @@ export default function WorkspacePage() {
                                   <button key={j.id}
                                     className={cn(
                                       "border rounded-xl p-3.5 bg-white text-left transition-all group",
-                                      "hover:shadow-md hover:border-zinc-300 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-indigo-400",
+                                      "hover:shadow-md hover:border-zinc-300 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-brand-400",
                                       isOverdue && "ring-1 ring-amber-300 border-amber-200",
                                       isDeadlinePassed && "ring-1 ring-red-200 border-red-200",
                                     )}
@@ -1626,10 +1626,10 @@ export default function WorkspacePage() {
                                         </span>
                                       )}
                                       {j.aiContent?.coverLetter && (
-                                        <span className="text-[10px] px-1.5 py-0.5 rounded bg-indigo-50 border border-indigo-100 text-indigo-500">CL ✓</span>
+                                        <span className="text-[10px] px-1.5 py-0.5 rounded bg-brand-50 border border-brand-100 text-brand-500">CL ✓</span>
                                       )}
                                       {j.aiContent?.tailoredResume && (
-                                        <span className="text-[10px] px-1.5 py-0.5 rounded bg-indigo-50 border border-indigo-100 text-indigo-500">Resume ✓</span>
+                                        <span className="text-[10px] px-1.5 py-0.5 rounded bg-brand-50 border border-brand-100 text-brand-500">Resume ✓</span>
                                       )}
                                     </div>
                                   </button>
@@ -1643,7 +1643,7 @@ export default function WorkspacePage() {
                         <div className="text-center py-12">
                           <p className="text-[13px] text-zinc-400">No applications match your search.</p>
                           <button
-                            className="mt-2 text-[12px] text-indigo-600 hover:text-indigo-700 underline"
+                            className="mt-2 text-[12px] text-brand-600 hover:text-brand-700 underline"
                             onClick={() => { setAppSearch(''); setAppFavOnly(false) }}
                           >
                             Clear filters
@@ -1766,7 +1766,7 @@ export default function WorkspacePage() {
                   </div>
                   <button
                     onClick={() => resumeOnlyRef.current?.click()}
-                    className="text-[12px] text-indigo-500 hover:text-indigo-700 underline shrink-0"
+                    className="text-[12px] text-brand-500 hover:text-brand-700 underline shrink-0"
                   >
                     {masterResumeText ? 'Replace' : 'Upload'}
                   </button>
@@ -1786,7 +1786,7 @@ export default function WorkspacePage() {
                     </div>
                     <Button
                       size="sm"
-                      className="gap-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg h-8 text-[12px] mt-1"
+                      className="gap-1.5 bg-brand-600 hover:bg-brand-700 text-white rounded-lg h-8 text-[12px] mt-1"
                       onClick={() => setCurrentView('jobs')}
                     >
                       Go to My Jobs →
@@ -1815,7 +1815,7 @@ export default function WorkspacePage() {
                                 <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-blue-50 border border-blue-100 text-blue-600">Cover Letter</span>
                               )}
                               {hasTR && (
-                                <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-indigo-50 border border-indigo-100 text-indigo-600">Resume</span>
+                                <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-brand-50 border border-brand-100 text-brand-600">Resume</span>
                               )}
                               {j.appliedAt && (
                                 <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-emerald-50 border border-emerald-100 text-emerald-600">
@@ -1831,13 +1831,13 @@ export default function WorkspacePage() {
                               <div className="flex items-center gap-1.5">
                                 <button
                                   onClick={() => { setPreviewJob(j); setPreviewType('coverLetter') }}
-                                  className="inline-flex items-center gap-1 text-[11px] text-zinc-600 hover:text-indigo-600 border border-zinc-200 rounded-md px-2 py-1 hover:border-indigo-200 transition-colors"
+                                  className="inline-flex items-center gap-1 text-[11px] text-zinc-600 hover:text-brand-600 border border-zinc-200 rounded-md px-2 py-1 hover:border-brand-200 transition-colors"
                                 >
                                   <Eye className="h-3 w-3" /> View Cover Letter
                                 </button>
                                 <button
                                   onClick={() => handleCopy(j.aiContent.coverLetter!, `${j.id}-cl`)}
-                                  className="inline-flex items-center gap-1 text-[11px] text-zinc-600 hover:text-indigo-600 border border-zinc-200 rounded-md px-2 py-1 hover:border-indigo-200 transition-colors"
+                                  className="inline-flex items-center gap-1 text-[11px] text-zinc-600 hover:text-brand-600 border border-zinc-200 rounded-md px-2 py-1 hover:border-brand-200 transition-colors"
                                 >
                                   <Copy className="h-3 w-3" />
                                   {copiedKey === `${j.id}-cl` ? 'Copied!' : 'Copy'}
@@ -1848,13 +1848,13 @@ export default function WorkspacePage() {
                               <div className="flex items-center gap-1.5">
                                 <button
                                   onClick={() => { setPreviewJob(j); setPreviewType('tailoredResume') }}
-                                  className="inline-flex items-center gap-1 text-[11px] text-zinc-600 hover:text-indigo-600 border border-zinc-200 rounded-md px-2 py-1 hover:border-indigo-200 transition-colors"
+                                  className="inline-flex items-center gap-1 text-[11px] text-zinc-600 hover:text-brand-600 border border-zinc-200 rounded-md px-2 py-1 hover:border-brand-200 transition-colors"
                                 >
                                   <Eye className="h-3 w-3" /> View Resume
                                 </button>
                                 <button
                                   onClick={() => handleCopy(j.aiContent.tailoredResume!, `${j.id}-tr`)}
-                                  className="inline-flex items-center gap-1 text-[11px] text-zinc-600 hover:text-indigo-600 border border-zinc-200 rounded-md px-2 py-1 hover:border-indigo-200 transition-colors"
+                                  className="inline-flex items-center gap-1 text-[11px] text-zinc-600 hover:text-brand-600 border border-zinc-200 rounded-md px-2 py-1 hover:border-brand-200 transition-colors"
                                 >
                                   <Copy className="h-3 w-3" />
                                   {copiedKey === `${j.id}-tr` ? 'Copied!' : 'Copy'}
@@ -1913,7 +1913,7 @@ export default function WorkspacePage() {
                             )}
                             <button
                               onClick={() => { setCurrentView('jobs'); setBoardFilters(f => ({ ...f, sessionId: s.id })) }}
-                              className="text-[11px] text-indigo-500 hover:text-indigo-700 underline"
+                              className="text-[11px] text-brand-500 hover:text-brand-700 underline"
                             >
                               Filter board
                             </button>
@@ -1948,7 +1948,7 @@ export default function WorkspacePage() {
                             previewType === 'coverLetter' ? previewJob.aiContent.coverLetter! : previewJob.aiContent.tailoredResume!,
                             `preview-${previewType}`
                           )}
-                          className="inline-flex items-center gap-1 text-[12px] text-indigo-600 hover:text-indigo-800 border border-indigo-200 rounded-md px-2.5 py-1 hover:bg-indigo-50 transition-colors"
+                          className="inline-flex items-center gap-1 text-[12px] text-brand-600 hover:text-brand-800 border border-brand-200 rounded-md px-2.5 py-1 hover:bg-brand-50 transition-colors"
                         >
                           <Copy className="h-3 w-3" />
                           {copiedKey === `preview-${previewType}` ? 'Copied!' : 'Copy'}

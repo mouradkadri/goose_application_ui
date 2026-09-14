@@ -1,9 +1,27 @@
 import type { Metadata } from 'next'
-import { GeistSans } from 'geist/font/sans'
-import { GeistMono } from 'geist/font/mono'
+import { Bricolage_Grotesque, Inter, JetBrains_Mono } from 'next/font/google'
 import { Toaster } from 'sonner'
 import { SearchProvider } from '@/components/search-provider'
 import './globals.css'
+
+// Field Guide type system: a characterful humanist grotesque for display, a clean
+// neutral body face, and a mono reserved for data (scores, dates, statuses, IDs).
+const display = Bricolage_Grotesque({
+  subsets: ['latin'],
+  variable: '--font-display',
+  weight: ['500', '600', '700', '800'],
+  display: 'swap',
+})
+const sans = Inter({
+  subsets: ['latin'],
+  variable: '--font-sans',
+  display: 'swap',
+})
+const mono = JetBrains_Mono({
+  subsets: ['latin'],
+  variable: '--font-mono',
+  display: 'swap',
+})
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://goosejobs.vercel.app'
 const title = 'GooseJobs — AI Job Application Copilot'
@@ -49,7 +67,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`font-sans ${GeistSans.variable} ${GeistMono.variable}`}>
+      <body className={`font-sans ${display.variable} ${sans.variable} ${mono.variable}`}>
         <SearchProvider>
           {children}
         </SearchProvider>

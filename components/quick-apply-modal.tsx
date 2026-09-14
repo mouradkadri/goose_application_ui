@@ -132,7 +132,7 @@ export function QuickApplyModal({ jobs, onApplied, onClose }: QuickApplyModalPro
                 skipped <span className="font-semibold text-zinc-500">{skippedIds.length}</span>
               </p>
             </div>
-            <Button size="sm" onClick={onClose} className="mt-2 bg-indigo-600 hover:bg-indigo-700 text-white">
+            <Button size="sm" onClick={onClose} className="mt-2 bg-brand-600 hover:bg-brand-700 text-white">
               Close
             </Button>
           </div>
@@ -141,7 +141,7 @@ export function QuickApplyModal({ jobs, onApplied, onClose }: QuickApplyModalPro
             {/* Progress bar */}
             <div className="w-full h-1 rounded-full bg-zinc-100 overflow-hidden">
               <div
-                className="h-full bg-indigo-500 transition-all duration-300 rounded-full"
+                className="h-full bg-brand-500 transition-all duration-300 rounded-full"
                 style={{ width: `${(index / jobs.length) * 100}%` }}
               />
             </div>
@@ -186,7 +186,7 @@ export function QuickApplyModal({ jobs, onApplied, onClose }: QuickApplyModalPro
               <Button
                 variant="outline"
                 size="sm"
-                className="flex-1 gap-1.5 text-[12px] border-indigo-200 text-indigo-700 hover:bg-indigo-50"
+                className="flex-1 gap-1.5 text-[12px] border-brand-200 text-brand-700 hover:bg-brand-50"
                 onClick={handleCoverLetterPdf}
                 disabled={cvLoading || resumeLoading}
               >
@@ -196,7 +196,7 @@ export function QuickApplyModal({ jobs, onApplied, onClose }: QuickApplyModalPro
               <Button
                 variant="outline"
                 size="sm"
-                className="flex-1 gap-1.5 text-[12px] border-violet-200 text-violet-700 hover:bg-violet-50"
+                className="flex-1 gap-1.5 text-[12px] border-brand-200 text-brand-700 hover:bg-brand-50"
                 onClick={handleResumePdf}
                 disabled={cvLoading || resumeLoading}
               >
@@ -209,7 +209,7 @@ export function QuickApplyModal({ jobs, onApplied, onClose }: QuickApplyModalPro
             <div className="space-y-2">
               {job.applyUrl ? (
                 <Button
-                  className="w-full gap-2 bg-indigo-600 hover:bg-indigo-700 text-white"
+                  className="w-full gap-2 bg-brand-600 hover:bg-brand-700 text-white"
                   onClick={handleOpenAndApply}
                 >
                   <ExternalLink className="h-3.5 w-3.5" /> Open & Apply

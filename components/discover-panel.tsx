@@ -35,7 +35,7 @@ interface DiscoverPanelProps {
 const ATS_COLORS: Record<string, string> = {
   "Greenhouse": "bg-emerald-100 text-emerald-700 border-emerald-200",
   "Lever":      "bg-blue-100 text-blue-700 border-blue-200",
-  "Ashby":      "bg-violet-100 text-violet-700 border-violet-200",
+  "Ashby":      "bg-brand-100 text-brand-700 border-brand-200",
 }
 
 export function DiscoverPanel({ onTrackJob }: DiscoverPanelProps) {
@@ -114,7 +114,7 @@ export function DiscoverPanel({ onTrackJob }: DiscoverPanelProps) {
       {/* Header */}
       <div className="mb-6">
         <div className="flex items-center gap-2 mb-1">
-          <Compass className="h-5 w-5 text-indigo-500" />
+          <Compass className="h-5 w-5 text-brand-500" />
           <h2 className="text-xl font-bold tracking-tight">Discover</h2>
         </div>
         <p className="text-[13px] text-zinc-400">
@@ -145,7 +145,7 @@ export function DiscoverPanel({ onTrackJob }: DiscoverPanelProps) {
         <Button
           onClick={search}
           disabled={loading || !role.trim()}
-          className="h-9 gap-1.5 text-[13px] bg-indigo-600 hover:bg-indigo-700 text-white shrink-0"
+          className="h-9 gap-1.5 text-[13px] bg-brand-600 hover:bg-brand-700 text-white shrink-0"
         >
           {loading
             ? <Loader2 className="h-3.5 w-3.5 animate-spin" />
@@ -193,7 +193,7 @@ export function DiscoverPanel({ onTrackJob }: DiscoverPanelProps) {
                   className={cn(
                     "text-[11px] px-2.5 py-1 rounded-full border font-medium transition-colors",
                     atsFilter === opt
-                      ? "bg-indigo-600 text-white border-indigo-600"
+                      ? "bg-brand-600 text-white border-brand-600"
                       : "bg-white text-zinc-500 border-zinc-200 hover:border-zinc-300"
                   )}
                 >

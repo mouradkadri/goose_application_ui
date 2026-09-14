@@ -119,7 +119,7 @@ export function AiSearchLoader({
                 )}
               >
                 {isLast ? (
-                  <Loader2 className="h-3.5 w-3.5 shrink-0 mt-0.5 text-indigo-500 animate-spin" />
+                  <Loader2 className="h-3.5 w-3.5 shrink-0 mt-0.5 text-brand-500 animate-spin" />
                 ) : (
                   <CheckCircle2 className="h-3.5 w-3.5 shrink-0 mt-0.5 text-emerald-400" />
                 )}
@@ -134,7 +134,7 @@ export function AiSearchLoader({
           })}
           {logs.length === 0 && (
             <div className="flex items-center gap-2.5 text-[13px] text-zinc-400">
-              <Loader2 className="h-3.5 w-3.5 shrink-0 animate-spin text-indigo-400" />
+              <Loader2 className="h-3.5 w-3.5 shrink-0 animate-spin text-brand-400" />
               <span>Starting up…</span>
             </div>
           )}
@@ -145,7 +145,7 @@ export function AiSearchLoader({
         {isFinished && !isNoResults && (
           <Button
             onClick={onDone}
-            className="w-full bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg h-9 text-[13px] font-semibold tracking-tight transition-colors"
+            className="w-full bg-brand-600 hover:bg-brand-700 text-white rounded-lg h-9 text-[13px] font-semibold tracking-tight transition-colors"
           >
             View {jobCount} {jobCount === 1 ? "Job" : "Jobs"}
           </Button>

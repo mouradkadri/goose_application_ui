@@ -42,9 +42,9 @@ function StepDots({ current, total }: { current: number; total: number }) {
           className={cn(
             "rounded-full transition-all duration-300",
             i < current
-              ? "h-1.5 w-4 bg-indigo-500"
+              ? "h-1.5 w-4 bg-brand-500"
               : i === current
-              ? "h-1.5 w-4 bg-indigo-400"
+              ? "h-1.5 w-4 bg-brand-400"
               : "h-1.5 w-4 bg-zinc-200",
           )}
         />
@@ -75,7 +75,7 @@ function WelcomeStep({ onNext }: { onNext: () => void }) {
   return (
     <Card>
       <div className="flex flex-col items-center text-center gap-5">
-        <div className="h-16 w-16 rounded-2xl bg-indigo-600 flex items-center justify-center shadow-lg shadow-indigo-200">
+        <div className="h-16 w-16 rounded-2xl bg-brand-600 flex items-center justify-center shadow-lg shadow-brand-200">
           <Sparkles className="h-8 w-8 text-white" />
         </div>
 
@@ -96,8 +96,8 @@ function WelcomeStep({ onNext }: { onNext: () => void }) {
               key={label}
               className="flex flex-col items-center gap-1.5 p-3 rounded-lg bg-zinc-50 border border-zinc-100"
             >
-              <div className="h-8 w-8 rounded-lg bg-indigo-50 border border-indigo-100 flex items-center justify-center">
-                <Icon className="h-4 w-4 text-indigo-500" aria-hidden />
+              <div className="h-8 w-8 rounded-lg bg-brand-50 border border-brand-100 flex items-center justify-center">
+                <Icon className="h-4 w-4 text-brand-500" aria-hidden />
               </div>
               <span className="text-[12px] font-medium text-zinc-600 text-center">{label}</span>
             </div>
@@ -106,7 +106,7 @@ function WelcomeStep({ onNext }: { onNext: () => void }) {
 
         <Button
           onClick={onNext}
-          className="w-full h-11 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-[550] tracking-tight gap-2 mt-2 transition-colors"
+          className="w-full h-11 bg-brand-600 hover:bg-brand-700 text-white rounded-xl font-[550] tracking-tight gap-2 mt-2 transition-colors"
         >
           Get Started <ArrowRight className="h-4 w-4" />
         </Button>
@@ -159,10 +159,10 @@ function UploadStep({
           "border-2 border-dashed rounded-xl p-10 flex flex-col items-center gap-3 cursor-pointer",
           "transition-colors duration-200",
           dragging
-            ? "border-indigo-400 bg-indigo-50/60"
+            ? "border-brand-400 bg-brand-50/60"
             : file
             ? "border-emerald-300 bg-emerald-50/40"
-            : "border-zinc-200 bg-zinc-50/60 hover:border-indigo-300 hover:bg-indigo-50/30",
+            : "border-zinc-200 bg-zinc-50/60 hover:border-brand-300 hover:bg-brand-50/30",
         )}
       >
         <input
@@ -195,7 +195,7 @@ function UploadStep({
             </div>
             <div className="text-center">
               <p className="text-[14px] font-[550] text-zinc-700">
-                Drop your PDF here, or <span className="text-indigo-600">browse</span>
+                Drop your PDF here, or <span className="text-brand-600">browse</span>
               </p>
               <p className="text-[12px] text-zinc-400 mt-0.5">PDF only · Max 10 MB</p>
             </div>
@@ -206,7 +206,7 @@ function UploadStep({
       <Button
         onClick={() => file && onNext(file)}
         disabled={!file}
-        className="w-full h-11 mt-6 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-40 text-white rounded-xl font-[550] tracking-tight gap-2 transition-colors"
+        className="w-full h-11 mt-6 bg-brand-600 hover:bg-brand-700 disabled:opacity-40 text-white rounded-xl font-[550] tracking-tight gap-2 transition-colors"
       >
         Continue <ArrowRight className="h-4 w-4" />
       </Button>
@@ -259,7 +259,7 @@ function QAStep({
         {/* Target role */}
         <div className="p-4 rounded-xl border border-zinc-100 bg-zinc-50/60 space-y-2.5">
           <div className="flex items-center gap-2">
-            <Briefcase className="h-4 w-4 text-indigo-500 shrink-0" />
+            <Briefcase className="h-4 w-4 text-brand-500 shrink-0" />
             <span className="text-[13px] font-[550] text-zinc-800">Target role</span>
           </div>
           <input
@@ -270,7 +270,7 @@ function QAStep({
             className={cn(
               "w-full h-9 px-3 rounded-lg border bg-white text-[13px] outline-none",
               "transition-colors placeholder:text-zinc-300",
-              "focus:border-indigo-400 focus:ring-1 focus:ring-indigo-100",
+              "focus:border-brand-400 focus:ring-1 focus:ring-brand-100",
               "border-zinc-200",
             )}
           />
@@ -279,7 +279,7 @@ function QAStep({
         {/* Location */}
         <div className="p-4 rounded-xl border border-zinc-100 bg-zinc-50/60 space-y-2.5">
           <div className="flex items-center gap-2">
-            <MapPin className="h-4 w-4 text-indigo-500 shrink-0" />
+            <MapPin className="h-4 w-4 text-brand-500 shrink-0" />
             <span className="text-[13px] font-[550] text-zinc-800">Where are you looking?</span>
           </div>
           {availableLocations.length > 0 ? (
@@ -293,7 +293,7 @@ function QAStep({
               }}
               className={cn(
                 "w-full h-9 px-3 rounded-lg border bg-white text-[13px] outline-none cursor-pointer",
-                "transition-colors focus:border-indigo-400 focus:ring-1 focus:ring-indigo-100 border-zinc-200",
+                "transition-colors focus:border-brand-400 focus:ring-1 focus:ring-brand-100 border-zinc-200",
               )}
             >
               {availableLocations.map(l => (
@@ -311,7 +311,7 @@ function QAStep({
               className={cn(
                 "w-full h-9 px-3 rounded-lg border bg-white text-[13px] outline-none",
                 "transition-colors placeholder:text-zinc-300",
-                "focus:border-indigo-400 focus:ring-1 focus:ring-indigo-100 border-zinc-200",
+                "focus:border-brand-400 focus:ring-1 focus:ring-brand-100 border-zinc-200",
               )}
             />
           )}
@@ -320,7 +320,7 @@ function QAStep({
         {/* Work style */}
         <div className="p-4 rounded-xl border border-zinc-100 bg-zinc-50/60 space-y-2.5">
           <div className="flex items-center gap-2">
-            <Layers className="h-4 w-4 text-indigo-500 shrink-0" />
+            <Layers className="h-4 w-4 text-brand-500 shrink-0" />
             <span className="text-[13px] font-[550] text-zinc-800">Work style preference</span>
           </div>
           <div className="flex flex-wrap gap-2">
@@ -331,8 +331,8 @@ function QAStep({
                 className={cn(
                   "h-8 px-3 rounded-lg text-[12px] font-[500] border transition-colors",
                   prefs.workStyle === ws
-                    ? "bg-indigo-600 text-white border-indigo-600"
-                    : "bg-white text-zinc-600 border-zinc-200 hover:border-indigo-300",
+                    ? "bg-brand-600 text-white border-brand-600"
+                    : "bg-white text-zinc-600 border-zinc-200 hover:border-brand-300",
                 )}
               >
                 {ws}
@@ -344,7 +344,7 @@ function QAStep({
         {/* Seniority */}
         <div className="p-4 rounded-xl border border-zinc-100 bg-zinc-50/60 space-y-2.5">
           <div className="flex items-center gap-2">
-            <FileText className="h-4 w-4 text-indigo-500 shrink-0" />
+            <FileText className="h-4 w-4 text-brand-500 shrink-0" />
             <span className="text-[13px] font-[550] text-zinc-800">Seniority level</span>
           </div>
           <div className="flex flex-wrap gap-2">
@@ -355,8 +355,8 @@ function QAStep({
                 className={cn(
                   "h-8 px-3 rounded-lg text-[12px] font-[500] border transition-colors",
                   prefs.seniority === s
-                    ? "bg-indigo-600 text-white border-indigo-600"
-                    : "bg-white text-zinc-600 border-zinc-200 hover:border-indigo-300",
+                    ? "bg-brand-600 text-white border-brand-600"
+                    : "bg-white text-zinc-600 border-zinc-200 hover:border-brand-300",
                 )}
               >
                 {s}
@@ -369,7 +369,7 @@ function QAStep({
       <Button
         onClick={onNext}
         disabled={!valid}
-        className="w-full h-11 mt-6 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-40 text-white rounded-xl font-[550] tracking-tight gap-2 transition-colors"
+        className="w-full h-11 mt-6 bg-brand-600 hover:bg-brand-700 disabled:opacity-40 text-white rounded-xl font-[550] tracking-tight gap-2 transition-colors"
       >
         Find my jobs <ArrowRight className="h-4 w-4" />
       </Button>
@@ -475,7 +475,7 @@ function LoadingStep({
         >
           {logs.length === 0 && (
             <div className="flex items-center gap-2.5 text-[13px] text-zinc-400">
-              <Loader2 className="h-3.5 w-3.5 shrink-0 animate-spin text-indigo-400" />
+              <Loader2 className="h-3.5 w-3.5 shrink-0 animate-spin text-brand-400" />
               <span>Starting up…</span>
             </div>
           )}
@@ -484,7 +484,7 @@ function LoadingStep({
             return (
               <div key={i} className={cn("flex items-start gap-2.5 text-[13px] animate-in fade-in duration-200")}>
                 {isLast ? (
-                  <Loader2 className="h-3.5 w-3.5 shrink-0 mt-0.5 text-indigo-500 animate-spin" />
+                  <Loader2 className="h-3.5 w-3.5 shrink-0 mt-0.5 text-brand-500 animate-spin" />
                 ) : (
                   <CheckCircle2 className="h-3.5 w-3.5 shrink-0 mt-0.5 text-emerald-400" />
                 )}
@@ -527,7 +527,7 @@ function SuccessStep({ jobCount, onEnter }: { jobCount: number; onEnter: () => v
 
         <Button
           onClick={onEnter}
-          className="w-full h-11 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-[550] tracking-tight gap-2 transition-colors"
+          className="w-full h-11 bg-brand-600 hover:bg-brand-700 text-white rounded-xl font-[550] tracking-tight gap-2 transition-colors"
         >
           Enter Workspace <ArrowRight className="h-4 w-4" />
         </Button>
@@ -593,7 +593,7 @@ export default function OnboardingPage() {
         className="fixed inset-0 pointer-events-none opacity-[0.025]"
         style={{
           backgroundImage:
-            "linear-gradient(#6366f1 1px, transparent 1px), linear-gradient(to right, #6366f1 1px, transparent 1px)",
+            "linear-gradient(#c9a25f 1px, transparent 1px), linear-gradient(to right, #c9a25f 1px, transparent 1px)",
           backgroundSize: "40px 40px",
         }}
       />

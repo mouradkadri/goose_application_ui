@@ -162,7 +162,7 @@ function ExportMenu({
       <Button
         size="sm"
         variant="outline"
-        className="gap-1.5 h-8 text-[12px] border-indigo-200 text-indigo-700 hover:bg-indigo-50"
+        className="gap-1.5 h-8 text-[12px] border-brand-200 text-brand-700 hover:bg-brand-50"
         onClick={handlePdf}
         disabled={pdfLoading || texLoading}
       >
@@ -251,7 +251,7 @@ function DidYouApplyDialog({
         <p className="text-[13px] text-zinc-500">Mark this job as applied to keep your tracker up to date.</p>
         <div className="flex gap-2 pt-1">
           <Button
-            className="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white"
+            className="flex-1 bg-brand-600 hover:bg-brand-700 text-white"
             onClick={onYes}
           >
             Yes, I applied!
@@ -376,7 +376,7 @@ function JobDescriptionRenderer({ text }: { text: string }) {
           <ul key={i} className="space-y-1.5 mb-1">
             {block.items.map((item, j) => (
               <li key={j} className="flex items-start gap-2 text-[13px] text-zinc-600 leading-relaxed">
-                <span className="text-indigo-300 shrink-0 mt-[3px] text-[9px] font-bold">▸</span>
+                <span className="text-brand-300 shrink-0 mt-[3px] text-[9px] font-bold">▸</span>
                 <span>{item}</span>
               </li>
             ))}
@@ -476,7 +476,7 @@ function OverviewTab({ job, onUpdate }: { job: CopilotJob; onUpdate: (u: Partial
             </span>
           )}
           {isRemote && (
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-indigo-50 border border-indigo-200 text-[12px] text-indigo-600 font-medium">
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-brand-50 border border-brand-200 text-[12px] text-brand-600 font-medium">
               <Globe className="h-3 w-3 shrink-0" />
               Remote
             </span>
@@ -508,8 +508,8 @@ function OverviewTab({ job, onUpdate }: { job: CopilotJob; onUpdate: (u: Partial
 
       {/* Inline edit form */}
       {isEditing && (
-        <div className="rounded-lg border border-indigo-100 bg-indigo-50/40 p-4 space-y-3">
-          <p className="text-[11px] font-semibold text-indigo-600 uppercase tracking-wider">Edit details</p>
+        <div className="rounded-lg border border-brand-100 bg-brand-50/40 p-4 space-y-3">
+          <p className="text-[11px] font-semibold text-brand-600 uppercase tracking-wider">Edit details</p>
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1">
               <label className="text-[11px] font-medium text-zinc-500">Job Title</label>
@@ -560,7 +560,7 @@ function OverviewTab({ job, onUpdate }: { job: CopilotJob; onUpdate: (u: Partial
             <Button variant="ghost" size="sm" className="h-7 text-[12px]" onClick={() => setIsEditing(false)}>
               Cancel
             </Button>
-            <Button size="sm" className="h-7 text-[12px] bg-indigo-600 hover:bg-indigo-700 text-white" onClick={saveEdits}>
+            <Button size="sm" className="h-7 text-[12px] bg-brand-600 hover:bg-brand-700 text-white" onClick={saveEdits}>
               Save changes
             </Button>
           </div>
@@ -744,7 +744,7 @@ function OverviewTab({ job, onUpdate }: { job: CopilotJob; onUpdate: (u: Partial
             {needsTruncate && !expanded && (
               <div className="mt-3 pt-3 border-t border-zinc-100">
                 <button
-                  className="text-[12px] text-indigo-600 hover:text-indigo-700 flex items-center gap-1 font-medium"
+                  className="text-[12px] text-brand-600 hover:text-brand-700 flex items-center gap-1 font-medium"
                   onClick={() => setExpanded(true)}
                 >
                   <ChevronDown className="h-3 w-3" /> Show full description
@@ -754,7 +754,7 @@ function OverviewTab({ job, onUpdate }: { job: CopilotJob; onUpdate: (u: Partial
           </div>
           {needsTruncate && expanded && (
             <button
-              className="mt-2 text-[12px] text-indigo-600 hover:text-indigo-700 flex items-center gap-1 font-medium"
+              className="mt-2 text-[12px] text-brand-600 hover:text-brand-700 flex items-center gap-1 font-medium"
               onClick={() => setExpanded(false)}
             >
               <ChevronUp className="h-3 w-3" /> Show less
@@ -767,13 +767,13 @@ function OverviewTab({ job, onUpdate }: { job: CopilotJob; onUpdate: (u: Partial
 
       {/* Apply Kit — quick-copy companion */}
       {(job.aiContent?.coverLetter || job.aiContent?.tailoredResume) && (
-        <div className="rounded-xl border border-indigo-100 bg-gradient-to-br from-indigo-50/60 to-white p-4 space-y-3">
+        <div className="rounded-xl border border-brand-100 bg-gradient-to-br from-brand-50/60 to-white p-4 space-y-3">
           <div className="flex items-center gap-2">
-            <ClipboardCheck className="h-4 w-4 text-indigo-500 shrink-0" />
-            <h3 className="text-[12px] font-bold text-indigo-800 uppercase tracking-wide">Apply Kit</h3>
-            <span className="text-[10px] text-indigo-400 ml-auto">click any button to copy to clipboard</span>
+            <ClipboardCheck className="h-4 w-4 text-brand-500 shrink-0" />
+            <h3 className="text-[12px] font-bold text-brand-800 uppercase tracking-wide">Apply Kit</h3>
+            <span className="text-[10px] text-brand-400 ml-auto">click any button to copy to clipboard</span>
           </div>
-          <p className="text-[11px] text-indigo-600/70 leading-relaxed -mt-1">
+          <p className="text-[11px] text-brand-600/70 leading-relaxed -mt-1">
             Hitting Apply Now auto-copies your cover letter. Use these buttons to re-copy any doc while filling the form.
           </p>
           <div className="space-y-2">
@@ -857,7 +857,7 @@ function ApplyKitRow({ label, preview, content }: { label: string; preview: stri
   }
 
   return (
-    <div className="flex items-center justify-between gap-3 bg-white rounded-lg border border-indigo-100 px-3 py-2.5">
+    <div className="flex items-center justify-between gap-3 bg-white rounded-lg border border-brand-100 px-3 py-2.5">
       <div className="min-w-0 flex-1">
         <p className="text-[12px] font-semibold text-zinc-800">{label}</p>
         <p className="text-[11px] text-zinc-400 truncate mt-0.5">{preview}</p>
@@ -868,7 +868,7 @@ function ApplyKitRow({ label, preview, content }: { label: string; preview: stri
           "shrink-0 flex items-center gap-1.5 text-[11px] font-semibold px-2.5 py-1.5 rounded-lg transition-all",
           copied
             ? "bg-emerald-100 text-emerald-700 border border-emerald-200"
-            : "bg-indigo-600 hover:bg-indigo-700 text-white border border-indigo-700",
+            : "bg-brand-600 hover:bg-brand-700 text-white border border-brand-700",
         )}
       >
         {copied ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
@@ -1024,7 +1024,7 @@ function ResumeTab({ job, masterResume, masterResumeText, onAiContent, onUploadR
         ) : (
           <Button
             size="sm"
-            className="gap-2 bg-indigo-600 hover:bg-indigo-700 text-white"
+            className="gap-2 bg-brand-600 hover:bg-brand-700 text-white"
             onClick={handleBuildDoc}
             disabled={docState === 'loading' || !masterResumeText}
           >
@@ -1547,7 +1547,7 @@ export function JobCopilotPanel({ job, masterResume, masterResumeText, onUpdate,
                 value={id}
                 className={cn(
                   "rounded-none border-b-2 border-transparent px-2 md:px-3 py-2.5 text-[11px] md:text-xs font-medium gap-1 relative",
-                  "data-[state=active]:border-indigo-600 data-[state=active]:text-indigo-600 data-[state=active]:bg-transparent",
+                  "data-[state=active]:border-brand-600 data-[state=active]:text-brand-600 data-[state=active]:bg-transparent",
                   live
                     ? "data-[state=inactive]:text-zinc-500 data-[state=inactive]:hover:text-zinc-800"
                     : "data-[state=inactive]:text-zinc-300 data-[state=inactive]:hover:text-zinc-400",

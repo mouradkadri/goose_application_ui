@@ -185,7 +185,7 @@ export function SettingsPanel({ jobs, onClearWorkspace }: SettingsPanelProps) {
                   "gap-1.5 text-[12px] transition-all",
                   savedPrefs
                     ? "bg-emerald-600 hover:bg-emerald-600 text-white"
-                    : "bg-indigo-600 hover:bg-indigo-700 text-white",
+                    : "bg-brand-600 hover:bg-brand-700 text-white",
                 )}
                 onClick={savePrefs}
               >
@@ -198,7 +198,7 @@ export function SettingsPanel({ jobs, onClearWorkspace }: SettingsPanelProps) {
           ) : (
             <p className="text-[12px] text-zinc-400">
               No preferences found. Complete{" "}
-              <a href="/onboarding" className="text-indigo-600 underline">onboarding</a> first.
+              <a href="/onboarding" className="text-brand-600 underline">onboarding</a> first.
             </p>
           )}
         </Section>
@@ -207,7 +207,7 @@ export function SettingsPanel({ jobs, onClearWorkspace }: SettingsPanelProps) {
         <Section title="Weekly Application Goal" description="Set a target to keep your job search consistent.">
           <Field label="Applications per week">
             <div className="flex items-center gap-2">
-              <Target className="h-4 w-4 text-indigo-400 shrink-0" />
+              <Target className="h-4 w-4 text-brand-400 shrink-0" />
               <Input
                 type="number"
                 min={1}
@@ -218,7 +218,7 @@ export function SettingsPanel({ jobs, onClearWorkspace }: SettingsPanelProps) {
               />
               <Button
                 size="sm"
-                className={cn("gap-1.5 text-[12px] transition-all", goalSaved ? "bg-emerald-600 hover:bg-emerald-600 text-white" : "bg-indigo-600 hover:bg-indigo-700 text-white")}
+                className={cn("gap-1.5 text-[12px] transition-all", goalSaved ? "bg-emerald-600 hover:bg-emerald-600 text-white" : "bg-brand-600 hover:bg-brand-700 text-white")}
                 onClick={saveGoal}
               >
                 {goalSaved ? <><CheckCircle2 className="h-3.5 w-3.5" /> Saved!</> : <><Save className="h-3.5 w-3.5" /> Save</>}

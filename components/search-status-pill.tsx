@@ -48,7 +48,7 @@ export function SearchStatusPill({ logs, onDismiss }: SearchStatusPillProps) {
       <button
         onClick={onDismiss}
         aria-label="Cancel background search"
-        className="ml-1 text-zinc-500 hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-indigo-400 rounded"
+        className="ml-1 text-zinc-500 hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-brand-400 rounded"
       >
         <X className="h-3.5 w-3.5" />
       </button>

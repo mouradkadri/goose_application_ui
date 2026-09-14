@@ -3,88 +3,127 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* ============================================================================
+   GooseJobs — "Field Guide" identity
+   Warm paper working surfaces + ink type + a single amber accent and a pine
+   secondary. Data (scores, dates, statuses, IDs) is set in mono. The app body
+   is warm-light "pages"; cover screens (enter/onboarding) + sidebar are the
+   warm-dark "leather cover". Amber ties the two together.
+   ============================================================================ */
+
 :root {
-  /* Indigo brand scale */
-  --brand-50: #eef2ff;
-  --brand-100: #e0e7ff;
-  --brand-200: #c7d2fe;
-  --brand-300: #a5b4fc;
-  --brand-400: #818cf8;
-  --brand-500: #6366f1;
-  --brand-600: #4f46e5;
-  --brand-700: #4338ca;
-  --brand-800: #3730a3;
-  --brand-900: #312e81;
+  /* Core Field Guide palette */
+  --paper: #fbf9f4; /* working-surface background */
+  --paper-2: #f4efe4; /* recessed / subtle fills */
+  --card-bg: #fffefb; /* raised cards */
+  --ink: #1a1712; /* primary text */
+  --ink-soft: #4a4235; /* secondary text */
+  --stone: #6e6555; /* muted text — ~5.2:1 on paper (AA) */
+  --line: #e7e0d2; /* hairline borders */
+  --line-strong: #d9d0bd;
 
-  --brand: #6366f1;
-  --brand-hover: #4f46e5;
-  --background: #ffffff;
-  --foreground: #09090b;
-  --card: #ffffff;
-  --card-foreground: #09090b;
-  --popover: #ffffff;
-  --popover-foreground: #09090b;
-  --primary: #18181b;
-  --primary-foreground: #fafafa;
-  --secondary: #f4f4f5;
-  --secondary-foreground: #18181b;
-  --muted: #f4f4f5;
-  /* WCAG AA fix: zinc-600 (~7:1 vs white) instead of zinc-500 (~4:1) */
-  --muted-foreground: #52525b;
-  --accent: #f4f4f5;
-  --accent-foreground: #18181b;
-  --destructive: #ef4444;
-  --destructive-foreground: #fafafa;
-  --border: #e4e4e7;
-  --input: #ffffff;
-  /* Indigo focus ring — replaces nearly-invisible zinc ring */
-  --ring: #6366f1;
-  --radius: 0.375rem;
-  --chart-1: #2563eb;
-  --chart-2: #16a34a;
-  --chart-3: #d97706;
-  --chart-4: #7c3aed;
-  --chart-5: #db2777;
+  /* Amber accent scale (replaces the default v0 indigo) */
+  --brand-50: #fbf3e8;
+  --brand-100: #f6e6cf;
+  --brand-200: #eecca0;
+  --brand-300: #e6b172;
+  --brand-400: #e8933a; /* signature amber — fills / active */
+  --brand-500: #d97e22;
+  --brand-600: #b5641a; /* interactive text / links — AA on paper */
+  --brand-700: #8f4e17;
+  --brand-800: #6b3b15;
+  --brand-900: #4a2a11;
+  --brand: #b5641a;
+  --brand-hover: #8f4e17;
+  --amber: #e8933a;
 
-  /* Sidebar — warm dark, matched to the vintage Goose Jobs logo palette */
-  --sidebar: #13100a;           /* near-black with warm amber tint */
-  --sidebar-foreground: #9a8570;  /* warm desaturated tan for inactive items */
-  --sidebar-primary: #f2e4cf;     /* warm cream — used for logo text */
+  /* Secondary + status hues */
+  --pine: #1e3a2f; /* deep green — success/offer, secondary accent */
+  --pine-mid: #2f5e49; /* success text on paper */
+  --pine-tint: #e7efe8; /* success surface */
+  --clay: #b5462f; /* alert / destructive / rejected */
+  --clay-tint: #f6e7e2;
+
+  /* shadcn semantic tokens mapped onto the palette */
+  --background: var(--paper);
+  --foreground: var(--ink);
+  --card: var(--card-bg);
+  --card-foreground: var(--ink);
+  --popover: var(--card-bg);
+  --popover-foreground: var(--ink);
+  --primary: var(--ink); /* default solid buttons = warm ink */
+  --primary-foreground: #fbf9f4;
+  --secondary: var(--paper-2);
+  --secondary-foreground: var(--ink);
+  --muted: var(--paper-2);
+  --muted-foreground: var(--stone);
+  --accent: var(--paper-2);
+  --accent-foreground: var(--ink);
+  --destructive: var(--clay);
+  --destructive-foreground: #fbf9f4;
+  --border: var(--line);
+  --input: var(--line);
+  --ring: var(--brand-400);
+
+  /* Data-viz — warm, cohesive (not the default cold rainbow) */
+  --chart-1: #b5641a;
+  --chart-2: #2f5e49;
+  --chart-3: #d97e22;
+  --chart-4: #8f4e17;
+  --chart-5: #6e6555;
+
+  --radius: 0.5rem;
+
+  /* Sidebar / cover — warm dark "leather", matched to the vintage goose logo */
+  --sidebar: #13100a;
+  --sidebar-foreground: #9a8570;
+  --sidebar-primary: #f2e4cf;
   --sidebar-primary-foreground: #13100a;
-  --sidebar-accent: #221a0f;      /* slightly lighter warm brown for hover/active bg */
-  --sidebar-accent-foreground: #f2e4cf;  /* warm cream for active text */
-  --sidebar-border: #1e1810;      /* warm dark border */
-  --sidebar-ring: rgba(245, 158, 11, 0.2);  /* amber glow for focus ring */
+  --sidebar-accent: #221a0f;
+  --sidebar-accent-foreground: #f2e4cf;
+  --sidebar-border: #211a10;
+  --sidebar-ring: rgba(232, 147, 58, 0.35);
+
+  /* Cover-screen tokens (enter / onboarding) */
+  --cover: #13100a;
+  --cover-panel: #1a1510;
+  --cover-line: #2a2018;
+  --cover-ink: #f2e4cf;
+  --cover-ink-soft: #9a8570;
+  --cover-ink-faint: #4a3f32;
 }
 
 .dark {
-  --background: #09090b;
-  --foreground: #fafafa;
-  --card: #18181b;
-  --card-foreground: #fafafa;
-  --popover: #18181b;
-  --popover-foreground: #fafafa;
-  --primary: #fafafa;
-  --primary-foreground: #18181b;
-  --secondary: #27272a;
-  --secondary-foreground: #fafafa;
-  --muted: #27272a;
-  --muted-foreground: #a1a1aa;
-  --accent: #27272a;
-  --accent-foreground: #fafafa;
-  --destructive: #dc2626;
-  --destructive-foreground: #fafafa;
-  --border: #27272a;
-  --input: #27272a;
-  --ring: rgba(255, 255, 255, 0.1);
-  --sidebar: #000000;
-  --sidebar-foreground: #71717a;
-  --sidebar-primary: #fafafa;
-  --sidebar-primary-foreground: #09090b;
-  --sidebar-accent: #18181b;
-  --sidebar-accent-foreground: #e4e4e7;
-  --sidebar-border: #18181b;
-  --sidebar-ring: rgba(255, 255, 255, 0.1);
+  --paper: #17130d;
+  --paper-2: #1f1a12;
+  --card-bg: #1c1710;
+  --ink: #f2e8d8;
+  --ink-soft: #cbbda6;
+  --stone: #9a8d78;
+  --line: #2a2318;
+  --line-strong: #362d1f;
+
+  --background: var(--paper);
+  --foreground: var(--ink);
+  --card: var(--card-bg);
+  --card-foreground: var(--ink);
+  --popover: var(--card-bg);
+  --popover-foreground: var(--ink);
+  --primary: #f2e4cf;
+  --primary-foreground: #17130d;
+  --secondary: var(--paper-2);
+  --secondary-foreground: var(--ink);
+  --muted: var(--paper-2);
+  --muted-foreground: var(--stone);
+  --accent: var(--paper-2);
+  --accent-foreground: var(--ink);
+  --destructive: #cf5238;
+  --destructive-foreground: #fbf9f4;
+  --border: var(--line);
+  --input: var(--line);
+  --ring: var(--brand-400);
+  --pine-tint: #17281f;
+  --clay-tint: #2a1712;
 }
 
 @theme inline {
@@ -124,6 +163,15 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+
+  /* Field Guide extras — usable as bg-paper / text-ink / text-brand / bg-pine ... */
+  --color-paper: var(--paper);
+  --color-paper-2: var(--paper-2);
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-stone: var(--stone);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
   --color-brand: var(--brand);
   --color-brand-50: var(--brand-50);
   --color-brand-100: var(--brand-100);
@@ -135,6 +183,24 @@
   --color-brand-700: var(--brand-700);
   --color-brand-800: var(--brand-800);
   --color-brand-900: var(--brand-900);
+  --color-amber: var(--amber);
+  --color-pine: var(--pine);
+  --color-pine-mid: var(--pine-mid);
+  --color-pine-tint: var(--pine-tint);
+  --color-clay: var(--clay);
+  --color-clay-tint: var(--clay-tint);
+  /* "leather" = the warm-dark cover surface (avoids Tailwind's built-in bg-cover) */
+  --color-leather: var(--cover);
+  --color-leather-panel: var(--cover-panel);
+  --color-leather-line: var(--cover-line);
+  --color-leather-ink: var(--cover-ink);
+  --color-leather-ink-soft: var(--cover-ink-soft);
+  --color-leather-ink-faint: var(--cover-ink-faint);
+
+  /* Fonts (wired in layout.tsx via next/font) */
+  --font-sans: var(--font-sans);
+  --font-mono: var(--font-mono);
+  --font-display: var(--font-display);
 }
 
 @layer base {
@@ -143,20 +209,43 @@
   }
   body {
     @apply bg-background text-foreground;
+    font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
     font-size: 14px;
-    font-feature-settings: "rlig" 1, "calt" 1;
+    font-feature-settings: "cv05" 1, "ss01" 1, "calt" 1;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
-  /* Visible indigo focus ring (WCAG AA) */
+  /* Display face for headings, with tuned tracking */
+  h1, h2, h3, .font-display {
+    font-family: var(--font-display), var(--font-sans), sans-serif;
+    letter-spacing: -0.015em;
+  }
+  /* Amber focus ring (WCAG AA) */
   *:focus-visible {
-    outline: 2px solid var(--brand);
+    outline: 2px solid var(--brand-400);
     outline-offset: 2px;
   }
 }
 
-/* Scrollbar */
-::-webkit-scrollbar { width: 4px; height: 4px; }
+/* Small-caps utility label used across the Field Guide (eyebrows / section keys) */
+.fg-label {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--stone);
+}
+
+/* Tabular mono for numeric data (scores, dates, counts) */
+.fg-data {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+
+/* Scrollbar — warm */
+::-webkit-scrollbar { width: 5px; height: 5px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: #e4e4e7; border-radius: 99px; }
-::-webkit-scrollbar-thumb:hover { background: #a1a1aa; }
+::-webkit-scrollbar-thumb { background: #d9d0bd; border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: #b5a888; }

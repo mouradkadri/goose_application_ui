@@ -198,7 +198,7 @@ export function JobBoardToolbar({
             aria-label="Search jobs by title, company or location"
             className={cn(
               "w-full pl-6 pr-2 py-1.5 text-[12px] rounded-md border border-zinc-200",
-              "bg-zinc-50 outline-none focus:border-indigo-300 focus:bg-white focus:ring-1 focus:ring-indigo-200",
+              "bg-zinc-50 outline-none focus:border-brand-300 focus:bg-white focus:ring-1 focus:ring-brand-200",
               "transition-colors placeholder:text-zinc-400",
             )}
           />
@@ -237,13 +237,13 @@ export function JobBoardToolbar({
               className={cn(
                 "h-[30px] px-2 flex items-center gap-1 rounded-md border transition-colors text-[11px] font-medium shrink-0",
                 advancedActiveCount > 0
-                  ? "border-indigo-300 bg-indigo-50 text-indigo-700"
+                  ? "border-brand-300 bg-brand-50 text-brand-700"
                   : "border-zinc-200 text-zinc-500 hover:border-zinc-300",
               )}
             >
               <SlidersHorizontal className="h-3 w-3" />
               {advancedActiveCount > 0 && (
-                <span className="h-4 min-w-4 flex items-center justify-center rounded-full bg-indigo-600 text-white text-[10px] font-bold px-1">
+                <span className="h-4 min-w-4 flex items-center justify-center rounded-full bg-brand-600 text-white text-[10px] font-bold px-1">
                   {advancedActiveCount}
                 </span>
               )}
@@ -263,7 +263,7 @@ export function JobBoardToolbar({
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <label className="text-[12px] font-medium text-zinc-700">Min match score</label>
-                <span className="text-[12px] font-semibold text-indigo-600 tabular-nums">
+                <span className="text-[12px] font-semibold text-brand-600 tabular-nums">
                   {filters.minScore > 0 ? `≥ ${filters.minScore}%` : 'Any'}
                 </span>
               </div>
@@ -292,7 +292,7 @@ export function JobBoardToolbar({
                     className={cn(
                       "flex-1 h-7 rounded-md border text-[11px] font-medium transition-colors",
                       filters.remote === opt.value
-                        ? "border-indigo-300 bg-indigo-50 text-indigo-700"
+                        ? "border-brand-300 bg-brand-50 text-brand-700"
                         : "border-zinc-200 text-zinc-500 hover:border-zinc-300 hover:bg-zinc-50",
                     )}
                   >
@@ -313,7 +313,7 @@ export function JobBoardToolbar({
                     className={cn(
                       "h-7 rounded-md border text-[11px] font-medium transition-colors",
                       filters.source === opt.value
-                        ? "border-indigo-300 bg-indigo-50 text-indigo-700"
+                        ? "border-brand-300 bg-brand-50 text-brand-700"
                         : "border-zinc-200 text-zinc-500 hover:border-zinc-300 hover:bg-zinc-50",
                     )}
                   >
@@ -334,7 +334,7 @@ export function JobBoardToolbar({
             className={cn(
               "h-7 w-[115px] text-[11px] font-medium rounded-md px-2 border transition-colors",
               filters.status !== 'all'
-                ? "border-indigo-300 text-indigo-700 bg-indigo-50"
+                ? "border-brand-300 text-brand-700 bg-brand-50"
                 : "border-zinc-200 text-zinc-500 bg-white",
             )}
           >
@@ -354,7 +354,7 @@ export function JobBoardToolbar({
             className={cn(
               "h-7 w-[110px] text-[11px] font-medium rounded-md px-2 border transition-colors",
               filters.sort !== 'newest'
-                ? "border-indigo-300 text-indigo-700 bg-indigo-50"
+                ? "border-brand-300 text-brand-700 bg-brand-50"
                 : "border-zinc-200 text-zinc-500 bg-white",
             )}
           >
@@ -374,7 +374,7 @@ export function JobBoardToolbar({
               className={cn(
                 "h-7 w-[120px] text-[11px] font-medium rounded-md px-2 border transition-colors",
                 filters.sessionId !== 'all'
-                  ? "border-indigo-300 text-indigo-700 bg-indigo-50"
+                  ? "border-brand-300 text-brand-700 bg-brand-50"
                   : "border-zinc-200 text-zinc-500 bg-white",
               )}
             >
@@ -398,25 +398,25 @@ export function JobBoardToolbar({
 
         {/* Active advanced filter pills */}
         {filters.remote !== 'all' && (
-          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-indigo-50 border border-indigo-200 text-[11px] font-medium text-indigo-700">
+          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-brand-50 border border-brand-200 text-[11px] font-medium text-brand-700">
             {filters.remote === 'remote' ? 'Remote' : 'On-site'}
-            <button onClick={() => set({ remote: 'all' })} className="hover:text-indigo-900">
+            <button onClick={() => set({ remote: 'all' })} className="hover:text-brand-900">
               <X className="h-2.5 w-2.5" />
             </button>
           </span>
         )}
         {filters.source !== 'all' && (
-          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-indigo-50 border border-indigo-200 text-[11px] font-medium text-indigo-700">
+          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-brand-50 border border-brand-200 text-[11px] font-medium text-brand-700">
             {SOURCE_LABELS[filters.source]}
-            <button onClick={() => set({ source: 'all' })} className="hover:text-indigo-900">
+            <button onClick={() => set({ source: 'all' })} className="hover:text-brand-900">
               <X className="h-2.5 w-2.5" />
             </button>
           </span>
         )}
         {filters.minScore > 0 && (
-          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-indigo-50 border border-indigo-200 text-[11px] font-medium text-indigo-700">
+          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-brand-50 border border-brand-200 text-[11px] font-medium text-brand-700">
             ≥{filters.minScore}% match
-            <button onClick={() => set({ minScore: 0 })} className="hover:text-indigo-900">
+            <button onClick={() => set({ minScore: 0 })} className="hover:text-brand-900">
               <X className="h-2.5 w-2.5" />
             </button>
           </span>
