@@ -1,0 +1,59 @@
+# GooseJobs
+
+> GooseJobs is an AI-powered job application management platform that helps job seekers search, tailor, track, and manage their entire job hunt in one workspace.
+
+## Summary
+
+GooseJobs combines three tools job seekers typically use separately: a multi-board job aggregator, a Kanban application tracker, and an AI copilot for resume and cover letter generation. It is currently in private beta and requires an invite code to access.
+
+URL: https://goosejobs.vercel.app/enter
+
+## Core Features
+
+- **AI Job Search**: Searches 25+ job boards in a single query. Sources include LinkedIn, Indeed, Google Jobs, Glassdoor, Remotive, WeWorkRemotely, Hacker News (Who's Hiring), Himalayas, Jobicy, Landing.jobs, Arbeitnow, EURES (EU Employment Services), No-Fluff Jobs (Poland), DevITjobs.eu, Greenhouse (direct ATS), Lever (direct ATS), Ashby (direct ATS), JSearch, Adzuna, USAJobs (US federal), Y Combinator jobs, Reed.co.uk (UK), Careerjet, TheirStack, and 4 Day Week. Results are re-ranked by AI (bi-encoder + cross-encoder) based on the user's resume and desired role.
+
+- **Application Pipeline**: A Kanban-style tracker with columns: Saved, Applied, Interviewing, Offer, Rejected. Each card stores job details, the resume version submitted, the cover letter, notes, and activity log. Supports drag-and-drop between stages.
+
+- **AI Copilot**: A chat interface for resume tailoring (paste a job description, get a tailored resume), cover letter generation, interview question prep, and application strategy feedback. Powered by Google Gemini.
+
+- **Document Vault**: Stores multiple versions of the user's resume. Supports PDF upload and text extraction for AI processing.
+
+## Target Audience
+
+Job seekers in the United States and European Union, particularly in tech and knowledge-work fields. Strong coverage for Germany, France, UK, Netherlands, Poland, Sweden, and other EU countries.
+
+## Technical Details
+
+- Frontend: Next.js 15, React, TypeScript, Tailwind CSS
+- Backend: Python (FastAPI), SQLite
+- AI: Google Gemini (language generation), Sentence Transformers (bi-encoder ranking), cross-encoder reranking
+- Job data: Aggregated from 25+ sources via direct APIs; no scraping
+- Embedding cache: SQLite-backed cache keyed by content hash to avoid redundant API calls
+
+## Frequently Asked Questions
+
+**What makes GooseJobs different from standard job boards?**
+GooseJobs aggregates listings from 25+ boards simultaneously and ranks them by AI relevance against your own resume — so you see jobs matched to your actual profile, not generic keyword results. It also keeps all your applications, tailored documents, and communications in one place.
+
+**Does GooseJobs work for remote jobs?**
+Yes. It includes dedicated remote-only boards (Remotive, WeWorkRemotely, Himalayas, Jobicy, Working Nomads) as well as a source specifically for 4-day-work-week companies.
+
+**Does GooseJobs work outside the US?**
+Yes. GooseJobs includes EU-specific sources (EURES, Arbeitnow, No-Fluff Jobs, DevITjobs.eu, Reed.co.uk, Arbeitsagentur for Germany) and regional coverage for most major EU countries. Coverage for North Africa and the Middle East is limited.
+
+**Can GooseJobs tailor my resume automatically?**
+Yes. The AI copilot reads a job description and your existing resume, then rewrites bullet points and adjusts language to match the role's requirements and improve ATS pass rates.
+
+**Is GooseJobs free?**
+GooseJobs is currently in private beta. Access requires an invite code. Future pricing has not been announced.
+
+**What job types does GooseJobs cover?**
+Full-time, part-time, contract, freelance, and internship positions. Remote, hybrid, and on-site. Entry-level through senior roles. Strongest coverage in software engineering, data, product, design, marketing, and operations.
+
+## Access
+
+Private beta. Invite code required at: https://goosejobs.vercel.app/enter
+
+## Contact
+
+For access requests or questions: kadriemna97@gmail.com

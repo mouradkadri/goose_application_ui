@@ -1,10 +1,39 @@
 User-agent: *
-# Allow the public entry page to be indexed
 Allow: /enter
 Allow: /opengraph-image
-
-# Keep the app and API routes private
+Allow: /llms.txt
 Disallow: /api/
+Disallow: /
+
+# AI crawlers — same access as standard bots
+User-agent: GPTBot
+Allow: /enter
+Allow: /llms.txt
+Disallow: /
+
+User-agent: anthropic-ai
+Allow: /enter
+Allow: /llms.txt
+Disallow: /
+
+User-agent: ClaudeBot
+Allow: /enter
+Allow: /llms.txt
+Disallow: /
+
+User-agent: PerplexityBot
+Allow: /enter
+Allow: /llms.txt
+Disallow: /
+
+User-agent: Google-Extended
+Allow: /enter
+Allow: /llms.txt
+Disallow: /
+
+User-agent: Amazonbot
+Allow: /enter
+Allow: /llms.txt
 Disallow: /
 
 Sitemap: /sitemap.xml

@@ -58,7 +58,7 @@ export function ProcessingResumeScreen({ onProcessingComplete }: ProcessingResum
       <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-blue-200/30 blur-[120px] rounded-full" />
 
       {/* HEADER */}
-      <header className="absolute top-0 left-0 w-full bg-white/80 backdrop-blur-sm border-b border-gray-200 z-50">
+      <header className="absolute top-0 left-0 w-full bg-card/80 backdrop-blur-sm border-b border-gray-200 z-50">
         <div className="max-w-5xl mx-auto flex items-center gap-3 px-4 md:px-6 h-20">
           <img 
             src="/goose_job_logo.png" 
@@ -75,7 +75,7 @@ export function ProcessingResumeScreen({ onProcessingComplete }: ProcessingResum
 
 
       {/* Main Content Card */}
-      <div className="w-full max-w-lg mx-auto flex flex-col items-center bg-white/80 backdrop-blur-xl rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.05)] border border-white p-8 md:p-12 relative z-20 mt-16">
+      <div className="w-full max-w-lg mx-auto flex flex-col items-center bg-card/80 backdrop-blur-xl rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.05)] border border-white p-8 md:p-12 relative z-20 mt-16">
         
         {/* Animation Container */}
         <div className="relative flex justify-center items-center">

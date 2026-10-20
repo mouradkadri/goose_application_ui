@@ -2,12 +2,13 @@
 
 import { useState, useRef, useCallback, useEffect } from "react"
 import {
-  ArrowRight, Upload, CheckCircle2, Loader2, Sparkles,
-  FileText, MapPin, Briefcase, Layers, XCircle,
-  Target, PenLine, Zap,
+  ArrowRight, Upload, CheckCircle2, Loader2,
+  FileText, XCircle,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useJobSearchStream, LocationPrefs } from "@/lib/use-job-search-stream"
+import { resumeStore } from "@/lib/resume-store"
+import { session as sessionStore } from "@/lib/session"
 import { cn } from "@/lib/utils"
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -45,7 +46,7 @@ function StepDots({ current, total }: { current: number; total: number }) {
               ? "h-1.5 w-4 bg-brand-500"
               : i === current
               ? "h-1.5 w-4 bg-brand-400"
-              : "h-1.5 w-4 bg-zinc-200",
+              : "h-1.5 w-4 bg-line",
           )}
         />
       ))}
@@ -59,7 +60,7 @@ function Card({ children, className }: { children: React.ReactNode; className?: 
   return (
     <div
       className={cn(
-        "bg-white rounded-2xl shadow-[0_4px_32px_rgba(0,0,0,0.07)] border border-zinc-100",
+        "bg-card rounded-lg shadow border border-line",
         "w-full max-w-xl mx-auto px-8 py-10 flex flex-col",
         className,
       )}
@@ -74,41 +75,35 @@ function Card({ children, className }: { children: React.ReactNode; className?: 
 function WelcomeStep({ onNext }: { onNext: () => void }) {
   return (
     <Card>
-      <div className="flex flex-col items-center text-center gap-5">
-        <div className="h-16 w-16 rounded-2xl bg-brand-600 flex items-center justify-center shadow-lg shadow-brand-200">
-          <Sparkles className="h-8 w-8 text-white" />
-        </div>
-
+      <div className="flex flex-col gap-6">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-zinc-900">Welcome to GooseJobs</h1>
-          <p className="text-[15px] text-zinc-500 mt-2 leading-relaxed max-w-xs mx-auto">
-            Your AI-powered job application copilot. Let&apos;s set up your workspace in under a minute.
+          <p className="fg-label text-brand-600 mb-3">Setup · 2 minutes</p>
+          <h1 className="text-[22px] font-bold tracking-tight text-ink leading-snug">
+            Your job search,<br />in one workspace.
+          </h1>
+          <p className="text-[14px] text-stone mt-3 leading-relaxed">
+            Upload your resume once. GooseJobs finds matching roles, ranks them against your profile, and helps you apply with tailored documents.
           </p>
         </div>
 
-        <div className="grid grid-cols-3 gap-3 w-full mt-2">
+        <ul className="space-y-2.5 border-t border-line pt-5">
           {[
-            { Icon: Target,  label: "Smart matching"   },
-            { Icon: PenLine, label: "AI cover letters" },
-            { Icon: Zap,     label: "One-click apply"  },
-          ].map(({ Icon, label }) => (
-            <div
-              key={label}
-              className="flex flex-col items-center gap-1.5 p-3 rounded-lg bg-zinc-50 border border-zinc-100"
-            >
-              <div className="h-8 w-8 rounded-lg bg-brand-50 border border-brand-100 flex items-center justify-center">
-                <Icon className="h-4 w-4 text-brand-500" aria-hidden />
-              </div>
-              <span className="text-[12px] font-medium text-zinc-600 text-center">{label}</span>
-            </div>
+            "Scans job boards and ranks results against your actual resume",
+            "Generates tailored cover letters and resumes for each role",
+            "Tracks every application from saved → applied → offer",
+          ].map((item) => (
+            <li key={item} className="flex items-start gap-2.5 text-[13px] text-stone">
+              <span className="text-brand-500 shrink-0 mt-0.5 font-bold">—</span>
+              <span>{item}</span>
+            </li>
           ))}
-        </div>
+        </ul>
 
         <Button
           onClick={onNext}
-          className="w-full h-11 bg-brand-600 hover:bg-brand-700 text-white rounded-xl font-[550] tracking-tight gap-2 mt-2 transition-colors"
+          className="w-full h-10 bg-brand-600 hover:bg-brand-700 text-white rounded-md font-semibold gap-2 transition-colors"
         >
-          Get Started <ArrowRight className="h-4 w-4" />
+          Get started <ArrowRight className="h-4 w-4" />
         </Button>
       </div>
     </Card>
@@ -144,8 +139,8 @@ function UploadStep({
   return (
     <Card>
       <StepDots current={1} total={4} />
-      <h2 className="text-xl font-bold tracking-tight text-zinc-900 mb-1">Upload your resume</h2>
-      <p className="text-[13px] text-zinc-500 mb-6">
+      <h2 className="text-xl font-bold tracking-tight text-ink mb-1">Upload your resume</h2>
+      <p className="text-[13px] text-stone mb-6">
         We&apos;ll use it to find and rank the best matching positions for you.
       </p>
 
@@ -156,13 +151,13 @@ function UploadStep({
         onDragLeave={() => setDragging(false)}
         onDrop={onDrop}
         className={cn(
-          "border-2 border-dashed rounded-xl p-10 flex flex-col items-center gap-3 cursor-pointer",
+          "border-2 border-dashed rounded-lg p-10 flex flex-col items-center gap-3 cursor-pointer",
           "transition-colors duration-200",
           dragging
             ? "border-brand-400 bg-brand-50/60"
             : file
             ? "border-emerald-300 bg-emerald-50/40"
-            : "border-zinc-200 bg-zinc-50/60 hover:border-brand-300 hover:bg-brand-50/30",
+            : "border-line bg-paper-2/60 hover:border-brand-300 hover:bg-brand-50/30",
         )}
       >
         <input
@@ -178,26 +173,26 @@ function UploadStep({
 
         {file ? (
           <>
-            <div className="h-12 w-12 rounded-full bg-emerald-50 border border-emerald-100 flex items-center justify-center">
-              <CheckCircle2 className="h-6 w-6 text-emerald-500" />
+            <div className="h-10 w-10 rounded-md bg-emerald-50 border border-emerald-200 flex items-center justify-center">
+              <CheckCircle2 className="h-5 w-5 text-emerald-500" />
             </div>
             <div className="text-center">
-              <p className="text-[14px] font-[550] text-zinc-800">{file.name}</p>
-              <p className="text-[12px] text-zinc-400 mt-0.5">
+              <p className="text-[14px] font-[550] text-ink">{file.name}</p>
+              <p className="text-[12px] text-stone mt-0.5">
                 {(file.size / 1024).toFixed(0)} KB · Click to replace
               </p>
             </div>
           </>
         ) : (
           <>
-            <div className="h-12 w-12 rounded-full bg-zinc-100 border border-zinc-200 flex items-center justify-center">
-              <Upload className="h-5 w-5 text-zinc-400" />
+            <div className="h-10 w-10 rounded-md bg-paper-2 border border-line flex items-center justify-center">
+              <Upload className="h-5 w-5 text-stone" />
             </div>
             <div className="text-center">
-              <p className="text-[14px] font-[550] text-zinc-700">
+              <p className="text-[14px] font-[550] text-ink-soft">
                 Drop your PDF here, or <span className="text-brand-600">browse</span>
               </p>
-              <p className="text-[12px] text-zinc-400 mt-0.5">PDF only · Max 10 MB</p>
+              <p className="text-[12px] text-stone mt-0.5">PDF only · Max 10 MB</p>
             </div>
           </>
         )}
@@ -206,7 +201,7 @@ function UploadStep({
       <Button
         onClick={() => file && onNext(file)}
         disabled={!file}
-        className="w-full h-11 mt-6 bg-brand-600 hover:bg-brand-700 disabled:opacity-40 text-white rounded-xl font-[550] tracking-tight gap-2 transition-colors"
+        className="w-full h-10 mt-6 bg-brand-600 hover:bg-brand-700 disabled:opacity-40 text-white rounded-md font-semibold gap-2 transition-colors"
       >
         Continue <ArrowRight className="h-4 w-4" />
       </Button>
@@ -252,36 +247,30 @@ function QAStep({
   return (
     <Card>
       <StepDots current={2} total={4} />
-      <h2 className="text-xl font-bold tracking-tight text-zinc-900 mb-1">Tell us what you&apos;re after</h2>
-      <p className="text-[13px] text-zinc-500 mb-6">Four quick questions to calibrate your search.</p>
+      <h2 className="text-xl font-bold tracking-tight text-ink mb-1">Tell us what you&apos;re after</h2>
+      <p className="text-[13px] text-stone mb-6">Four quick questions to calibrate your search.</p>
 
-      <div className="space-y-5">
+      <div className="space-y-5 border-t border-line pt-5">
         {/* Target role */}
-        <div className="p-4 rounded-xl border border-zinc-100 bg-zinc-50/60 space-y-2.5">
-          <div className="flex items-center gap-2">
-            <Briefcase className="h-4 w-4 text-brand-500 shrink-0" />
-            <span className="text-[13px] font-[550] text-zinc-800">Target role</span>
-          </div>
+        <div className="space-y-1.5">
+          <label className="fg-label block text-stone">Target role</label>
           <input
             type="text"
             value={prefs.role}
             placeholder="e.g. Software Engineer, Data Scientist"
             onChange={(e) => onChange({ role: e.target.value })}
             className={cn(
-              "w-full h-9 px-3 rounded-lg border bg-white text-[13px] outline-none",
-              "transition-colors placeholder:text-zinc-300",
-              "focus:border-brand-400 focus:ring-1 focus:ring-brand-100",
-              "border-zinc-200",
+              "w-full h-9 px-3 rounded-md border bg-card text-[13px] outline-none",
+              "transition-colors placeholder:text-stone/40",
+              "focus:border-brand-400",
+              "border-line",
             )}
           />
         </div>
 
         {/* Location */}
-        <div className="p-4 rounded-xl border border-zinc-100 bg-zinc-50/60 space-y-2.5">
-          <div className="flex items-center gap-2">
-            <MapPin className="h-4 w-4 text-brand-500 shrink-0" />
-            <span className="text-[13px] font-[550] text-zinc-800">Where are you looking?</span>
-          </div>
+        <div className="space-y-1.5">
+          <label className="fg-label block text-stone">Location</label>
           {availableLocations.length > 0 ? (
             <select
               value={prefs.country_code ?? (prefs.is_remote ? 'remote' : '')}
@@ -292,8 +281,8 @@ function QAStep({
                 if (opt) onChange({ location: opt.label, country_code: opt.country_code, is_remote: opt.remote })
               }}
               className={cn(
-                "w-full h-9 px-3 rounded-lg border bg-white text-[13px] outline-none cursor-pointer",
-                "transition-colors focus:border-brand-400 focus:ring-1 focus:ring-brand-100 border-zinc-200",
+                "w-full h-9 px-3 rounded-md border bg-card text-[13px] outline-none cursor-pointer",
+                "transition-colors focus:border-brand-400 border-line",
               )}
             >
               {availableLocations.map(l => (
@@ -309,30 +298,27 @@ function QAStep({
               placeholder="e.g. United States, Germany, Remote"
               onChange={(e) => onChange({ location: e.target.value })}
               className={cn(
-                "w-full h-9 px-3 rounded-lg border bg-white text-[13px] outline-none",
-                "transition-colors placeholder:text-zinc-300",
-                "focus:border-brand-400 focus:ring-1 focus:ring-brand-100 border-zinc-200",
+                "w-full h-9 px-3 rounded-md border bg-card text-[13px] outline-none",
+                "transition-colors placeholder:text-stone/40",
+                "focus:border-brand-400 border-line",
               )}
             />
           )}
         </div>
 
         {/* Work style */}
-        <div className="p-4 rounded-xl border border-zinc-100 bg-zinc-50/60 space-y-2.5">
-          <div className="flex items-center gap-2">
-            <Layers className="h-4 w-4 text-brand-500 shrink-0" />
-            <span className="text-[13px] font-[550] text-zinc-800">Work style preference</span>
-          </div>
-          <div className="flex flex-wrap gap-2">
+        <div className="space-y-1.5">
+          <label className="fg-label block text-stone">Work style</label>
+          <div className="flex flex-wrap gap-1.5">
             {WORK_STYLES.map((ws) => (
               <button
                 key={ws}
                 onClick={() => onChange({ workStyle: ws })}
                 className={cn(
-                  "h-8 px-3 rounded-lg text-[12px] font-[500] border transition-colors",
+                  "h-7 px-3 rounded-md text-[12px] font-medium border transition-colors",
                   prefs.workStyle === ws
-                    ? "bg-brand-600 text-white border-brand-600"
-                    : "bg-white text-zinc-600 border-zinc-200 hover:border-brand-300",
+                    ? "bg-ink text-paper border-ink"
+                    : "bg-card text-ink-soft border-line hover:border-ink-soft",
                 )}
               >
                 {ws}
@@ -342,21 +328,18 @@ function QAStep({
         </div>
 
         {/* Seniority */}
-        <div className="p-4 rounded-xl border border-zinc-100 bg-zinc-50/60 space-y-2.5">
-          <div className="flex items-center gap-2">
-            <FileText className="h-4 w-4 text-brand-500 shrink-0" />
-            <span className="text-[13px] font-[550] text-zinc-800">Seniority level</span>
-          </div>
-          <div className="flex flex-wrap gap-2">
+        <div className="space-y-1.5">
+          <label className="fg-label block text-stone">Seniority</label>
+          <div className="flex flex-wrap gap-1.5">
             {SENIORITIES.map((s) => (
               <button
                 key={s}
                 onClick={() => onChange({ seniority: s })}
                 className={cn(
-                  "h-8 px-3 rounded-lg text-[12px] font-[500] border transition-colors",
+                  "h-7 px-3 rounded-md text-[12px] font-medium border transition-colors",
                   prefs.seniority === s
-                    ? "bg-brand-600 text-white border-brand-600"
-                    : "bg-white text-zinc-600 border-zinc-200 hover:border-brand-300",
+                    ? "bg-ink text-paper border-ink"
+                    : "bg-card text-ink-soft border-line hover:border-ink-soft",
                 )}
               >
                 {s}
@@ -369,7 +352,7 @@ function QAStep({
       <Button
         onClick={onNext}
         disabled={!valid}
-        className="w-full h-11 mt-6 bg-brand-600 hover:bg-brand-700 disabled:opacity-40 text-white rounded-xl font-[550] tracking-tight gap-2 transition-colors"
+        className="w-full h-10 mt-6 bg-brand-600 hover:bg-brand-700 disabled:opacity-40 text-white rounded-md font-semibold gap-2 transition-colors"
       >
         Find my jobs <ArrowRight className="h-4 w-4" />
       </Button>
@@ -405,6 +388,17 @@ function LoadingStep({
       ? { label: prefs.location, country_code: prefs.country_code, remote: false }
       : null
 
+    // Store resume text so workspace AI features work without re-uploading
+    const fd = new FormData()
+    fd.append('resume_file', resumeFile)
+    fetch('/api/resume', { method: 'POST', body: fd })
+      .then(r => r.ok ? r.json() : null)
+      .then(d => {
+        if (d?.resume_text) resumeStore.add(resumeFile.name, d.resume_text)
+        if (d?.session_id) sessionStore.setId(d.session_id)
+      })
+      .catch(() => {})
+
     startStream(resumeFile, locationPrefs, {
       onStep: (msg) => setLogs((prev) => [...prev, msg]),
       onDone: (rawJobs, count) => {
@@ -432,16 +426,16 @@ function LoadingStep({
         {/* Visual */}
         <div className="relative">
           {hasError ? (
-            <div className="h-14 w-14 rounded-full bg-red-50 border border-red-100 flex items-center justify-center">
-              <XCircle className="h-7 w-7 text-red-500" />
+            <div className="h-12 w-12 rounded-md bg-red-50 border border-red-200 flex items-center justify-center">
+              <XCircle className="h-6 w-6 text-red-500" />
             </div>
           ) : isFinished ? (
-            <div className="h-14 w-14 rounded-full bg-emerald-50 border border-emerald-100 flex items-center justify-center">
-              <CheckCircle2 className="h-7 w-7 text-emerald-500" />
+            <div className="h-12 w-12 rounded-md bg-emerald-50 border border-emerald-200 flex items-center justify-center">
+              <CheckCircle2 className="h-6 w-6 text-emerald-500" />
             </div>
           ) : (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src="/goose.gif" alt="Hunting for your best matches…" width={88} height={88} className="rounded-xl" />
+            <img src="/goose.gif" alt="Hunting for your best matches…" width={88} height={88} className="rounded-md" />
           )}
         </div>
 
@@ -449,20 +443,20 @@ function LoadingStep({
         <div className="text-center">
           {hasError ? (
             <>
-              <p className="text-[15px] font-semibold text-zinc-900">Search failed</p>
-              <p className="text-[13px] text-zinc-500 mt-1 max-w-xs">{error}</p>
+              <p className="text-[15px] font-semibold text-ink">Search failed</p>
+              <p className="text-[13px] text-stone mt-1 max-w-xs">{error}</p>
             </>
           ) : isFinished ? (
             <>
-              <p className="text-[15px] font-semibold text-zinc-900">
+              <p className="text-[15px] font-semibold text-ink">
                 Found {jobCount} matching {jobCount === 1 ? "job" : "jobs"}
               </p>
-              <p className="text-[13px] text-zinc-500 mt-1">Tailored to your resume and preferences.</p>
+              <p className="text-[13px] text-stone mt-1">Tailored to your resume and preferences.</p>
             </>
           ) : (
             <>
-              <p className="text-[15px] font-semibold text-zinc-900">Hunting for your best matches</p>
-              <p className="text-[13px] text-zinc-500 mt-1">This usually takes 1–2 minutes.</p>
+              <p className="text-[15px] font-semibold text-ink">Hunting for your best matches</p>
+              <p className="text-[13px] text-stone mt-1">This usually takes 1–2 minutes.</p>
             </>
           )}
         </div>
@@ -471,10 +465,10 @@ function LoadingStep({
         <div
           role="log"
           aria-live="polite"
-          className="w-full max-h-44 overflow-y-auto rounded-lg bg-zinc-50 border border-zinc-100 p-3 space-y-1.5"
+          className="w-full max-h-44 overflow-y-auto rounded-lg bg-paper-2 border border-line p-3 space-y-1.5"
         >
           {logs.length === 0 && (
-            <div className="flex items-center gap-2.5 text-[13px] text-zinc-400">
+            <div className="flex items-center gap-2.5 text-[13px] text-stone">
               <Loader2 className="h-3.5 w-3.5 shrink-0 animate-spin text-brand-400" />
               <span>Starting up…</span>
             </div>
@@ -488,7 +482,7 @@ function LoadingStep({
                 ) : (
                   <CheckCircle2 className="h-3.5 w-3.5 shrink-0 mt-0.5 text-emerald-400" />
                 )}
-                <span className={cn("leading-snug", isLast ? "text-zinc-700 font-medium" : "text-zinc-400")}>{log}</span>
+                <span className={cn("leading-snug", isLast ? "text-ink-soft font-medium" : "text-stone")}>{log}</span>
               </div>
             )
           })}
@@ -510,26 +504,22 @@ function LoadingStep({
 function SuccessStep({ jobCount, onEnter }: { jobCount: number; onEnter: () => void }) {
   return (
     <Card>
-      <div className="flex flex-col items-center text-center gap-6">
-        <div className="h-16 w-16 rounded-full bg-emerald-50 border-2 border-emerald-100 flex items-center justify-center">
-          <CheckCircle2 className="h-8 w-8 text-emerald-500" />
-        </div>
-
+      <div className="flex flex-col gap-5">
         <div>
-          <p className="text-2xl font-bold tracking-tight text-zinc-900">
-            {jobCount} {jobCount === 1 ? "match" : "matches"} found!
+          <p className="fg-label text-pine-mid mb-3">Search complete</p>
+          <p className="text-[22px] font-bold tracking-tight text-ink">
+            {jobCount} {jobCount === 1 ? "match" : "matches"} found
           </p>
-          <p className="text-[14px] text-zinc-500 mt-2 max-w-xs mx-auto leading-relaxed">
-            Your AI copilot has found and ranked {jobCount} positions matching your resume.
-            Let&apos;s start applying.
+          <p className="text-[14px] text-stone mt-2 leading-relaxed">
+            Ranked by fit against your resume. Open each job to generate a tailored cover letter or resume.
           </p>
         </div>
 
         <Button
           onClick={onEnter}
-          className="w-full h-11 bg-brand-600 hover:bg-brand-700 text-white rounded-xl font-[550] tracking-tight gap-2 transition-colors"
+          className="w-full h-10 bg-brand-600 hover:bg-brand-700 text-white rounded-md font-semibold gap-2 transition-colors"
         >
-          Enter Workspace <ArrowRight className="h-4 w-4" />
+          Open workspace <ArrowRight className="h-4 w-4" />
         </Button>
       </div>
     </Card>
@@ -558,7 +548,7 @@ export default function OnboardingPage() {
   // Redirect if already onboarded
   useEffect(() => {
     if (typeof window !== "undefined" && localStorage.getItem("gj_onboarded")) {
-      window.location.href = "/"
+      window.location.href = "/workspace"
     }
   }, [])
 
@@ -585,17 +575,14 @@ export default function OnboardingPage() {
     <div
       className="min-h-screen flex flex-col items-center justify-center px-4 py-12"
       style={{
-        background: "radial-gradient(ellipse 80% 60% at 50% 0%, #eef2ff 0%, #f8fafc 60%, #ffffff 100%)",
+        background: 'radial-gradient(ellipse 120% 60% at 50% 0%, #5c3410 0%, #30190b 40%, #221409 70%, #181009 100%)'
       }}
     >
-      {/* Subtle grid texture */}
+      {/* Breathing amber glow overlay */}
       <div
-        className="fixed inset-0 pointer-events-none opacity-[0.025]"
-        style={{
-          backgroundImage:
-            "linear-gradient(#c9a25f 1px, transparent 1px), linear-gradient(to right, #c9a25f 1px, transparent 1px)",
-          backgroundSize: "40px 40px",
-        }}
+        aria-hidden
+        className="fixed inset-0 pointer-events-none glow-idle"
+        style={{ background: "radial-gradient(70% 45% at 50% 5%, rgba(232,147,58,0.20), transparent 68%)" }}
       />
 
       <div className="relative z-10 w-full max-w-xl">
@@ -633,7 +620,7 @@ export default function OnboardingPage() {
       </div>
 
       {/* Powered-by footer */}
-      <p className="relative z-10 mt-8 text-[11px] text-zinc-300 tracking-wide">
+      <p className="relative z-10 mt-8 text-[11px] text-leather-ink-soft tracking-wide">
         GOOSEJOBS · AI-POWERED JOB SEARCH
       </p>
     </div>

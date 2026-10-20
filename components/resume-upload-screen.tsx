@@ -50,7 +50,7 @@ export function ResumeUploadScreen({ onUpload }: ResumeUploadScreenProps) {
 
   return (
     <div className="bg-[#ecfeff] min-h-screen w-full">
-      <header className="w-full bg-white/80 backdrop-blur-sm border-b border-gray-200 sticky top-0 z-10">
+      <header className="w-full bg-card/80 backdrop-blur-sm border-b border-gray-200 sticky top-0 z-10">
         <div className="max-w-5xl mx-auto flex items-center gap-3 px-4 md:px-6">
           <img src="/goose_job_logo.png"  width={100} height={100} alt="goose jobs"/>
           <h1 className="text-2xl font-bold text-foreground">
@@ -74,12 +74,12 @@ export function ResumeUploadScreen({ onUpload }: ResumeUploadScreenProps) {
             onDragLeave={handleDragLeave}
             onDrop={handleDrop}
             className={`
-              relative w-full h-60 bg-white/50
+              relative w-full h-60 bg-card/50
               border-2 border-dashed border-gray-300
               flex flex-col justify-center items-center text-lg text-gray-700 
               rounded-xl cursor-pointer transition-all duration-300
               pulse-border
-              ${isDragging ? "border-primary scale-105 bg-white" : "hover:border-primary/50"}
+              ${isDragging ? "border-primary scale-105 bg-card" : "hover:border-primary/50"}
             `}
           >
             <DotLottieReact
@@ -125,7 +125,7 @@ export function ResumeUploadScreen({ onUpload }: ResumeUploadScreenProps) {
 
 const FeatureCard = ({ icon, title, description }: { icon: React.ReactNode; title: string; description: string }) => {
   return (
-    <div className="bg-white/60 backdrop-blur-md p-6 rounded-lg border border-gray-200/80 shadow-sm">
+    <div className="bg-card/60 backdrop-blur-md p-6 rounded-lg border border-gray-200/80 shadow-sm">
       <div className="flex items-center gap-4 mb-3">
         <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 text-primary">
           {icon}

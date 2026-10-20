@@ -22,6 +22,7 @@ import { cn } from "@/lib/utils"
 export type SortKey = 'newest' | 'match' | 'company' | 'applied'
 export type RemoteFilter = 'all' | 'remote' | 'onsite'
 export type SourceFilter = 'all' | 'ai_search' | 'manual' | 'url'
+export type DateRangeFilter = 'all' | '7d' | '30d' | '90d'
 
 export interface BoardFilters {
   search: string
@@ -32,6 +33,7 @@ export interface BoardFilters {
   minScore: number
   remote: RemoteFilter
   source: SourceFilter
+  dateRange: DateRangeFilter
 }
 
 export const DEFAULT_FILTERS: BoardFilters = {
@@ -43,6 +45,7 @@ export const DEFAULT_FILTERS: BoardFilters = {
   minScore: 0,
   remote: 'all',
   source: 'all',
+  dateRange: 'all',
 }
 
 export interface SearchSessionSummary {
@@ -76,6 +79,13 @@ const SOURCE_LABELS: Record<SourceFilter, string> = {
   manual: 'Manual',
   url: 'From URL',
 }
+
+const DATE_RANGE_OPTIONS: { value: DateRangeFilter; label: string }[] = [
+  { value: 'all', label: 'All time' },
+  { value: '7d', label: 'Last 7 days' },
+  { value: '30d', label: 'Last 30 days' },
+  { value: '90d', label: 'Last 3 months' },
+]
 
 export function applyFilters(jobs: CopilotJob[], filters: BoardFilters): CopilotJob[] {
   let result = [...jobs]
@@ -115,6 +125,14 @@ export function applyFilters(jobs: CopilotJob[], filters: BoardFilters): Copilot
 
   if (filters.source !== 'all') {
     result = result.filter(j => j.source === filters.source)
+  }
+
+  if (filters.dateRange !== 'all') {
+    const daysMap: Record<Exclude<DateRangeFilter, 'all'>, number> = { '7d': 7, '30d': 30, '90d': 90 }
+    const cutoff = new Date()
+    cutoff.setDate(cutoff.getDate() - daysMap[filters.dateRange as Exclude<DateRangeFilter, 'all'>])
+    const cutoffStr = cutoff.toISOString()
+    result = result.filter(j => j.addedAt >= cutoffStr)
   }
 
   switch (filters.sort) {
@@ -179,16 +197,17 @@ export function JobBoardToolbar({
     filters.favoritesOnly ||
     filters.search.trim() ||
     filters.sessionId !== 'all' ||
+    filters.dateRange !== 'all' ||
     advancedActiveCount > 0
 
   const clearAdvanced = () => set({ minScore: 0, remote: 'all', source: 'all' })
 
   return (
-    <div className="border-b bg-white px-2 py-1.5 space-y-1.5">
+    <div className="border-b bg-card px-2 py-1.5 space-y-1.5">
       {/* Search row */}
       <div className="flex items-center gap-1.5">
         <div className="relative flex-1">
-          <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-3 w-3 text-zinc-400 pointer-events-none" />
+          <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-3 w-3 text-stone/70 pointer-events-none" />
           <input
             ref={ref}
             type="text"
@@ -197,15 +216,15 @@ export function JobBoardToolbar({
             onChange={e => set({ search: e.target.value })}
             aria-label="Search jobs by title, company or location"
             className={cn(
-              "w-full pl-6 pr-2 py-1.5 text-[12px] rounded-md border border-zinc-200",
-              "bg-zinc-50 outline-none focus:border-brand-300 focus:bg-white focus:ring-1 focus:ring-brand-200",
-              "transition-colors placeholder:text-zinc-400",
+              "w-full pl-6 pr-2 py-1.5 text-[12px] rounded-md border border-line",
+              "bg-paper-2 outline-none focus:border-brand-300 focus:bg-card focus:ring-1 focus:ring-brand-200",
+              "transition-colors placeholder:text-stone/70",
             )}
           />
           {filters.search && (
             <button
               onClick={() => set({ search: '' })}
-              className="absolute right-1.5 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600"
+              className="absolute right-1.5 top-1/2 -translate-y-1/2 text-stone/70 hover:text-stone"
               aria-label="Clear search"
             >
               <X className="h-3 w-3" />
@@ -223,7 +242,7 @@ export function JobBoardToolbar({
             "h-[30px] w-[30px] flex items-center justify-center rounded-md border transition-colors shrink-0",
             filters.favoritesOnly
               ? "border-amber-300 bg-amber-50 text-amber-500"
-              : "border-zinc-200 text-zinc-400 hover:text-amber-500 hover:border-amber-200",
+              : "border-line text-stone/70 hover:text-amber-500 hover:border-amber-200",
           )}
         >
           <Star className={cn("h-3.5 w-3.5", filters.favoritesOnly && "fill-amber-400")} />
@@ -238,7 +257,7 @@ export function JobBoardToolbar({
                 "h-[30px] px-2 flex items-center gap-1 rounded-md border transition-colors text-[11px] font-medium shrink-0",
                 advancedActiveCount > 0
                   ? "border-brand-300 bg-brand-50 text-brand-700"
-                  : "border-zinc-200 text-zinc-500 hover:border-zinc-300",
+                  : "border-line text-stone hover:border-line-strong",
               )}
             >
               <SlidersHorizontal className="h-3 w-3" />
@@ -251,9 +270,9 @@ export function JobBoardToolbar({
           </PopoverTrigger>
           <PopoverContent className="w-72 p-4 space-y-4" align="end">
             <div className="flex items-center justify-between">
-              <p className="text-[13px] font-semibold text-zinc-800">Advanced filters</p>
+              <p className="text-[13px] font-semibold text-ink">Advanced filters</p>
               {advancedActiveCount > 0 && (
-                <button onClick={clearAdvanced} className="text-[11px] text-zinc-400 hover:text-zinc-600 underline">
+                <button onClick={clearAdvanced} className="text-[11px] text-stone/70 hover:text-stone underline">
                   Clear
                 </button>
               )}
@@ -262,7 +281,7 @@ export function JobBoardToolbar({
             {/* Min match score */}
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <label className="text-[12px] font-medium text-zinc-700">Min match score</label>
+                <label className="text-[12px] font-medium text-ink-soft">Min match score</label>
                 <span className="text-[12px] font-semibold text-brand-600 tabular-nums">
                   {filters.minScore > 0 ? `≥ ${filters.minScore}%` : 'Any'}
                 </span>
@@ -275,7 +294,7 @@ export function JobBoardToolbar({
                 onValueChange={([v]) => set({ minScore: v })}
                 className="py-1"
               />
-              <div className="flex justify-between text-[10px] text-zinc-400">
+              <div className="flex justify-between text-[10px] text-stone/70">
                 <span>Any</span>
                 <span>90%+</span>
               </div>
@@ -283,7 +302,7 @@ export function JobBoardToolbar({
 
             {/* Remote filter */}
             <div className="space-y-2">
-              <label className="text-[12px] font-medium text-zinc-700">Work type</label>
+              <label className="text-[12px] font-medium text-ink-soft">Work type</label>
               <div className="flex gap-1.5">
                 {REMOTE_OPTIONS.map(opt => (
                   <button
@@ -293,7 +312,7 @@ export function JobBoardToolbar({
                       "flex-1 h-7 rounded-md border text-[11px] font-medium transition-colors",
                       filters.remote === opt.value
                         ? "border-brand-300 bg-brand-50 text-brand-700"
-                        : "border-zinc-200 text-zinc-500 hover:border-zinc-300 hover:bg-zinc-50",
+                        : "border-line text-stone hover:border-line-strong hover:bg-paper-2",
                     )}
                   >
                     {opt.label}
@@ -304,7 +323,7 @@ export function JobBoardToolbar({
 
             {/* Source filter */}
             <div className="space-y-2">
-              <label className="text-[12px] font-medium text-zinc-700">Source</label>
+              <label className="text-[12px] font-medium text-ink-soft">Source</label>
               <div className="grid grid-cols-2 gap-1.5">
                 {SOURCE_OPTIONS.map(opt => (
                   <button
@@ -314,7 +333,7 @@ export function JobBoardToolbar({
                       "h-7 rounded-md border text-[11px] font-medium transition-colors",
                       filters.source === opt.value
                         ? "border-brand-300 bg-brand-50 text-brand-700"
-                        : "border-zinc-200 text-zinc-500 hover:border-zinc-300 hover:bg-zinc-50",
+                        : "border-line text-stone hover:border-line-strong hover:bg-paper-2",
                     )}
                   >
                     {opt.label}
@@ -335,7 +354,7 @@ export function JobBoardToolbar({
               "h-7 w-[115px] text-[11px] font-medium rounded-md px-2 border transition-colors",
               filters.status !== 'all'
                 ? "border-brand-300 text-brand-700 bg-brand-50"
-                : "border-zinc-200 text-zinc-500 bg-white",
+                : "border-line text-stone bg-card",
             )}
           >
             <SelectValue placeholder="All statuses" />
@@ -355,7 +374,7 @@ export function JobBoardToolbar({
               "h-7 w-[110px] text-[11px] font-medium rounded-md px-2 border transition-colors",
               filters.sort !== 'newest'
                 ? "border-brand-300 text-brand-700 bg-brand-50"
-                : "border-zinc-200 text-zinc-500 bg-white",
+                : "border-line text-stone bg-card",
             )}
           >
             <SelectValue />
@@ -363,6 +382,25 @@ export function JobBoardToolbar({
           <SelectContent className="text-[12px]">
             {(Object.entries(SORT_LABELS) as [SortKey, string][]).map(([k, v]) => (
               <SelectItem key={k} value={k} className="text-[12px]">{v}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+
+        {/* Date added — always visible on the wrapped second line, fills the space next to Session */}
+        <Select value={filters.dateRange} onValueChange={v => set({ dateRange: v as DateRangeFilter })}>
+          <SelectTrigger
+            className={cn(
+              "h-7 w-[110px] text-[11px] font-medium rounded-md px-2 border transition-colors",
+              filters.dateRange !== 'all'
+                ? "border-brand-300 text-brand-700 bg-brand-50"
+                : "border-line text-stone bg-card",
+            )}
+          >
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent className="text-[12px]">
+            {DATE_RANGE_OPTIONS.map(({ value, label }) => (
+              <SelectItem key={value} value={value} className="text-[12px]">{label}</SelectItem>
             ))}
           </SelectContent>
         </Select>
@@ -375,7 +413,7 @@ export function JobBoardToolbar({
                 "h-7 w-[120px] text-[11px] font-medium rounded-md px-2 border transition-colors",
                 filters.sessionId !== 'all'
                   ? "border-brand-300 text-brand-700 bg-brand-50"
-                  : "border-zinc-200 text-zinc-500 bg-white",
+                  : "border-line text-stone bg-card",
               )}
             >
               <SelectValue placeholder="All searches" />
@@ -386,7 +424,7 @@ export function JobBoardToolbar({
                 <SelectItem key={s.id} value={s.id} className="text-[12px]">
                   <div className="flex flex-col leading-snug max-w-[180px]">
                     <span className="truncate font-medium">{s.resumeName.replace(/\.[^.]+$/, '')}</span>
-                    <span className="text-[10px] text-zinc-400">
+                    <span className="text-[10px] text-stone/70">
                       {new Date(s.startedAt).toLocaleDateString()} · {s.jobCount} jobs{s.location ? ` · ${s.location}` : ''}
                     </span>
                   </div>
@@ -396,7 +434,7 @@ export function JobBoardToolbar({
           </Select>
         )}
 
-        {/* Active advanced filter pills */}
+        {/* Active filter pills */}
         {filters.remote !== 'all' && (
           <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-brand-50 border border-brand-200 text-[11px] font-medium text-brand-700">
             {filters.remote === 'remote' ? 'Remote' : 'On-site'}
@@ -426,7 +464,7 @@ export function JobBoardToolbar({
         {hasActiveFilter && (
           <button
             onClick={() => onChange({ ...DEFAULT_FILTERS, sort: filters.sort })}
-            className="text-[11px] text-zinc-400 hover:text-zinc-600 underline flex items-center gap-0.5"
+            className="text-[11px] text-stone/70 hover:text-stone underline flex items-center gap-0.5"
           >
             <X className="h-2.5 w-2.5" /> Clear all
           </button>
@@ -434,7 +472,7 @@ export function JobBoardToolbar({
 
         {/* Result count */}
         {hasActiveFilter && (
-          <span className="text-[11px] text-zinc-400 ml-auto">
+          <span className="text-[11px] text-stone/70 ml-auto">
             {visibleCount} / {totalJobs}
           </span>
         )}

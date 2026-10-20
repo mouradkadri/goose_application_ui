@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { Bricolage_Grotesque, Inter, JetBrains_Mono } from 'next/font/google'
+import { Bricolage_Grotesque, IBM_Plex_Sans, JetBrains_Mono } from 'next/font/google'
 import { Toaster } from 'sonner'
 import { SearchProvider } from '@/components/search-provider'
 import './globals.css'
@@ -12,9 +12,10 @@ const display = Bricolage_Grotesque({
   weight: ['500', '600', '700', '800'],
   display: 'swap',
 })
-const sans = Inter({
+const sans = IBM_Plex_Sans({
   subsets: ['latin'],
   variable: '--font-sans',
+  weight: ['400', '500', '600'],
   display: 'swap',
 })
 const mono = JetBrains_Mono({
@@ -34,6 +35,16 @@ export const metadata: Metadata = {
     template: '%s | GooseJobs',
   },
   description,
+  keywords: [
+    'AI job search',
+    'job application tracker',
+    'resume tailoring AI',
+    'cover letter generator',
+    'job board aggregator',
+    'AI career copilot',
+    'application pipeline',
+    'job hunt tool',
+  ],
   openGraph: {
     title,
     description,

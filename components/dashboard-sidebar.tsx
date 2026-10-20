@@ -2,18 +2,16 @@
 
 import { useState } from "react"
 import {
-  LayoutDashboard, Briefcase, Send, Calendar, FileText,
-  Settings, Star, Keyboard, Compass,
+  Briefcase, FileText, Settings, Star, Keyboard, Search, FolderOpen,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 // ── Mobile bottom nav (shown only on < md) ────────────────────────────────────
 const MOBILE_NAV = [
-  { id: "home",         label: "Home",     icon: LayoutDashboard },
-  { id: "jobs",         label: "Jobs",     icon: Briefcase       },
-  { id: "applications", label: "Apply",    icon: Send            },
-  { id: "discover",     label: "Discover", icon: Compass         },
-  { id: "settings",     label: "More",     icon: Settings        },
+  { id: "jobs",     label: "Pipeline",  icon: Briefcase   },
+  { id: "discover", label: "Search",    icon: Search      },
+  { id: "resumes",  label: "Documents", icon: FolderOpen  },
+  { id: "settings", label: "More",      icon: Settings    },
 ] as const
 
 export function MobileBottomNav({
@@ -73,13 +71,13 @@ interface DashboardSidebarProps {
 }
 
 const NAV = [
-  { id: "home",         label: "Dashboard",   icon: LayoutDashboard },
-  { id: "jobs",         label: "My Jobs",      icon: Briefcase       },
-  { id: "applications", label: "Applications", icon: Send            },
-  { id: "interviews",   label: "Interviews",   icon: Calendar        },
-  { id: "resumes",      label: "Resumes",      icon: FileText        },
-  { id: "discover",     label: "Discover",     icon: Compass         },
+  { id: "jobs",     label: "Pipeline",  icon: Briefcase  },
+  { id: "discover", label: "Search",    icon: Search     },
+  { id: "resumes",  label: "Documents", icon: FolderOpen },
 ] as const
+
+// views that belong to the pipeline section — keep it highlighted for all of them
+const PIPELINE_VIEWS = new Set(["jobs", "applications", "interviews", "home"])
 
 const FOOTER_NAV = [
   { id: "settings", label: "Settings", icon: Settings },
@@ -108,13 +106,15 @@ export function DashboardSidebar({
       {/* Logo */}
       <div className="h-[60px] flex items-center border-b border-sidebar-border shrink-0 px-2.5">
         <div className="flex items-center gap-2.5 min-w-0">
-          <img
-            src="/goose.gif"
-            width={40}
-            height={40}
-            alt="GooseJobs"
-            className="shrink-0 object-contain drop-shadow-sm"
-          />
+          <div className="h-10 w-10 shrink-0 rounded-md overflow-hidden drop-shadow-sm">
+            <img
+              src="/goose.gif"
+              width={40}
+              height={40}
+              alt="GooseJobs"
+              className="h-full w-full object-cover"
+            />
+          </div>
           <span className={cn(
             "font-bold text-[15px] tracking-tight whitespace-nowrap text-sidebar-primary transition-opacity duration-150",
             expanded ? "opacity-100" : "opacity-0 pointer-events-none",
@@ -127,7 +127,7 @@ export function DashboardSidebar({
       {/* Main nav */}
       <nav className="px-2 py-3 space-y-0.5 overflow-hidden shrink-0">
         {NAV.map(({ id, label, icon: Icon }) => {
-          const active = currentView === id
+          const active = id === "jobs" ? PIPELINE_VIEWS.has(currentView) : currentView === id
           const badge = navBadges[id]
           return (
             <button
@@ -160,7 +160,7 @@ export function DashboardSidebar({
                 {badge && !expanded && (
                   <span className={cn(
                     "absolute -top-1 -right-1 h-2 w-2 rounded-full border border-sidebar",
-                    badge.urgent ? "bg-amber-500" : "bg-zinc-500/60",
+                    badge.urgent ? "bg-amber-500" : "bg-paper-20/60",
                   )} />
                 )}
               </div>
@@ -179,7 +179,7 @@ export function DashboardSidebar({
                   "text-[10px] font-bold px-1.5 py-0.5 rounded-full tabular-nums shrink-0 ml-auto",
                   badge.urgent
                     ? "bg-amber-500/25 text-amber-400"
-                    : "bg-white/8 text-sidebar-foreground/50",
+                    : "bg-card/8 text-sidebar-foreground/50",
                 )}>
                   {badge.count > 99 ? '99+' : badge.count}
                 </span>

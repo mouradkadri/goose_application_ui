@@ -55,7 +55,7 @@ export function ResumeTab({ resumeUploaded, selectedJob, onResumeUpload, resumeF
 
             <iframe
               src={pdfUrl}
-              className="w-full rounded-lg border bg-white"
+              className="w-full rounded-lg border bg-card"
               style={{ height: '520px' }}
               title="Your Resume"
             />

@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect, useMemo } from "react"
+import Link from "next/link"
 import { CopilotJob, ResumeDocument, JobStatus, STATUS_LABELS, STATUS_COLORS, STATUS_TEXT, getMatchTier, MATCH_TIER_COLORS, RejectionReason, REJECTION_REASON_LABELS, ChecklistItem, DEFAULT_INTERVIEW_CHECKLIST } from "@/types/copilot-job"
 import { copilotStore } from "@/lib/copilot-store"
 import { buildResumeTex, buildCoverLetterTex, downloadText, downloadBlob, safeFilename } from "@/lib/doc-export"
@@ -28,6 +29,8 @@ interface JobCopilotPanelProps {
   onUpdate: (updates: Partial<CopilotJob>) => void
   onRemove: () => void
   onUploadResume?: () => void
+  /** When set, renders a link to the full job detail page in the panel header. */
+  detailHref?: string
 }
 
 // ── Shared helpers ────────────────────────────────────────────────────────────
@@ -66,10 +69,10 @@ function NoResumeBanner({ onUpload }: { onUpload?: () => void }) {
 
 function ComingSoonBanner({ feature }: { feature: string }) {
   return (
-    <div className="flex items-start gap-3 p-4 rounded-lg bg-zinc-50 border border-zinc-200 text-sm text-zinc-500">
-      <Info className="h-4 w-4 mt-0.5 shrink-0 text-zinc-400" />
+    <div className="flex items-start gap-3 p-4 rounded-lg bg-paper-2 border border-line text-sm text-stone">
+      <Info className="h-4 w-4 mt-0.5 shrink-0 text-stone/70" />
       <span>
-        <span className="font-medium text-zinc-700">{feature}</span> — requires external knowledge base data (Phase 2).
+        <span className="font-medium text-ink-soft">{feature}</span> — requires external knowledge base data (Phase 2).
       </span>
     </div>
   )
@@ -175,7 +178,7 @@ function ExportMenu({
       <Button
         size="sm"
         variant="outline"
-        className="gap-1.5 h-8 text-[12px] border-zinc-200 text-zinc-600 hover:bg-zinc-50"
+        className="gap-1.5 h-8 text-[12px] border-line text-stone hover:bg-paper-2"
         onClick={handleTex}
         disabled={pdfLoading || texLoading}
         title="Download Overleaf-ready LaTeX source"
@@ -248,7 +251,7 @@ function DidYouApplyDialog({
         <DialogHeader>
           <DialogTitle className="text-base font-semibold">Did you apply?</DialogTitle>
         </DialogHeader>
-        <p className="text-[13px] text-zinc-500">Mark this job as applied to keep your tracker up to date.</p>
+        <p className="text-[13px] text-stone">Mark this job as applied to keep your tracker up to date.</p>
         <div className="flex gap-2 pt-1">
           <Button
             className="flex-1 bg-brand-600 hover:bg-brand-700 text-white"
@@ -256,7 +259,7 @@ function DidYouApplyDialog({
           >
             Yes, I applied!
           </Button>
-          <Button variant="ghost" className="flex-1 text-zinc-500" onClick={onNo}>
+          <Button variant="ghost" className="flex-1 text-stone" onClick={onNo}>
             Not yet
           </Button>
         </div>
@@ -365,7 +368,7 @@ function JobDescriptionRenderer({ text }: { text: string }) {
 
         if (block.type === 'header') return (
           <h4 key={i} className={cn(
-            "text-[11px] font-bold text-zinc-500 uppercase tracking-wider pb-1 border-b border-zinc-100",
+            "text-[11px] font-bold text-stone uppercase tracking-wider pb-1 border-b border-line",
             i === 0 ? "mt-0 mb-2" : "mt-4 mb-2",
           )}>
             {block.text}
@@ -375,7 +378,7 @@ function JobDescriptionRenderer({ text }: { text: string }) {
         if (block.type === 'bullets') return (
           <ul key={i} className="space-y-1.5 mb-1">
             {block.items.map((item, j) => (
-              <li key={j} className="flex items-start gap-2 text-[13px] text-zinc-600 leading-relaxed">
+              <li key={j} className="flex items-start gap-2 text-[13px] text-stone leading-relaxed">
                 <span className="text-brand-300 shrink-0 mt-[3px] text-[9px] font-bold">▸</span>
                 <span>{item}</span>
               </li>
@@ -384,7 +387,7 @@ function JobDescriptionRenderer({ text }: { text: string }) {
         )
 
         return (
-          <p key={i} className="text-[13px] text-zinc-600 leading-relaxed">
+          <p key={i} className="text-[13px] text-stone leading-relaxed">
             {block.text}
           </p>
         )
@@ -470,8 +473,8 @@ function OverviewTab({ job, onUpdate }: { job: CopilotJob; onUpdate: (u: Partial
       <div className="flex flex-wrap items-start gap-2">
         <div className="flex flex-wrap gap-2 flex-1 min-w-0">
           {job.location && job.location !== 'Not specified' && (
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-zinc-50 border border-zinc-200 text-[12px] text-zinc-600 font-medium">
-              <MapPin className="h-3 w-3 text-zinc-400 shrink-0" />
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-paper-2 border border-line text-[12px] text-stone font-medium">
+              <MapPin className="h-3 w-3 text-stone/70 shrink-0" />
               {job.location}
             </span>
           )}
@@ -487,7 +490,7 @@ function OverviewTab({ job, onUpdate }: { job: CopilotJob; onUpdate: (u: Partial
               {job.salary}
             </span>
           )}
-          <span className="inline-flex items-center px-2.5 py-1 rounded-md bg-zinc-50 border border-zinc-200 text-[12px] text-zinc-400">
+          <span className="inline-flex items-center px-2.5 py-1 rounded-md bg-paper-2 border border-line text-[12px] text-stone/70">
             via {sourceLabel}
           </span>
           {job.appliedAt && (
@@ -498,7 +501,7 @@ function OverviewTab({ job, onUpdate }: { job: CopilotJob; onUpdate: (u: Partial
         </div>
         <button
           onClick={() => setIsEditing(e => !e)}
-          className="inline-flex items-center gap-1 text-[11px] font-medium text-zinc-400 hover:text-zinc-600 transition-colors shrink-0 mt-0.5"
+          className="inline-flex items-center gap-1 text-[11px] font-medium text-stone/70 hover:text-stone transition-colors shrink-0 mt-0.5"
           aria-label={isEditing ? 'Cancel editing' : 'Edit job details'}
         >
           {isEditing ? <X className="h-3 w-3" /> : <Pencil className="h-3 w-3" />}
@@ -512,7 +515,7 @@ function OverviewTab({ job, onUpdate }: { job: CopilotJob; onUpdate: (u: Partial
           <p className="text-[11px] font-semibold text-brand-600 uppercase tracking-wider">Edit details</p>
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1">
-              <label className="text-[11px] font-medium text-zinc-500">Job Title</label>
+              <label className="text-[11px] font-medium text-stone">Job Title</label>
               <Input
                 value={editForm.title}
                 onChange={e => setEditForm(f => ({ ...f, title: e.target.value }))}
@@ -520,7 +523,7 @@ function OverviewTab({ job, onUpdate }: { job: CopilotJob; onUpdate: (u: Partial
               />
             </div>
             <div className="space-y-1">
-              <label className="text-[11px] font-medium text-zinc-500">Company</label>
+              <label className="text-[11px] font-medium text-stone">Company</label>
               <Input
                 value={editForm.company}
                 onChange={e => setEditForm(f => ({ ...f, company: e.target.value }))}
@@ -530,7 +533,7 @@ function OverviewTab({ job, onUpdate }: { job: CopilotJob; onUpdate: (u: Partial
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1">
-              <label className="text-[11px] font-medium text-zinc-500">Location</label>
+              <label className="text-[11px] font-medium text-stone">Location</label>
               <Input
                 value={editForm.location}
                 onChange={e => setEditForm(f => ({ ...f, location: e.target.value }))}
@@ -538,7 +541,7 @@ function OverviewTab({ job, onUpdate }: { job: CopilotJob; onUpdate: (u: Partial
               />
             </div>
             <div className="space-y-1">
-              <label className="text-[11px] font-medium text-zinc-500">Salary</label>
+              <label className="text-[11px] font-medium text-stone">Salary</label>
               <Input
                 value={editForm.salary}
                 onChange={e => setEditForm(f => ({ ...f, salary: e.target.value }))}
@@ -548,7 +551,7 @@ function OverviewTab({ job, onUpdate }: { job: CopilotJob; onUpdate: (u: Partial
             </div>
           </div>
           <div className="space-y-1">
-            <label className="text-[11px] font-medium text-zinc-500">Apply URL</label>
+            <label className="text-[11px] font-medium text-stone">Apply URL</label>
             <Input
               value={editForm.applyUrl}
               onChange={e => setEditForm(f => ({ ...f, applyUrl: e.target.value }))}
@@ -570,7 +573,7 @@ function OverviewTab({ job, onUpdate }: { job: CopilotJob; onUpdate: (u: Partial
       {/* Status + Apply */}
       <div className="flex flex-wrap items-center gap-3">
         <div className="flex items-center gap-2">
-          <span className="text-[11px] font-semibold text-zinc-400 uppercase tracking-wider">Status</span>
+          <span className="text-[11px] font-semibold text-stone/70 uppercase tracking-wider">Status</span>
           <Select value={job.status} onValueChange={v => {
             const status = v as JobStatus
             const extra: Partial<CopilotJob> = {}
@@ -616,8 +619,8 @@ function OverviewTab({ job, onUpdate }: { job: CopilotJob; onUpdate: (u: Partial
       <div className="flex flex-wrap gap-x-6 gap-y-2">
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-2">
-            <Calendar className={cn("h-3.5 w-3.5 shrink-0", followUpDue ? "text-amber-500" : "text-zinc-400")} />
-            <span className={cn("text-[11px] font-semibold uppercase tracking-wider", followUpDue ? "text-amber-600" : "text-zinc-400")}>
+            <Calendar className={cn("h-3.5 w-3.5 shrink-0", followUpDue ? "text-amber-500" : "text-stone/70")} />
+            <span className={cn("text-[11px] font-semibold uppercase tracking-wider", followUpDue ? "text-amber-600" : "text-stone/70")}>
               Follow-up{followUpDue ? ' — due!' : ''}
             </span>
           </div>
@@ -629,15 +632,15 @@ function OverviewTab({ job, onUpdate }: { job: CopilotJob; onUpdate: (u: Partial
             aria-label="Follow-up reminder date"
           />
           {job.followUpAt && (
-            <button onClick={() => onUpdate({ followUpAt: undefined })} className="text-zinc-400 hover:text-zinc-600" aria-label="Clear follow-up">
+            <button onClick={() => onUpdate({ followUpAt: undefined })} className="text-stone/70 hover:text-stone" aria-label="Clear follow-up">
               <X className="h-3 w-3" />
             </button>
           )}
         </div>
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-2">
-            <Calendar className={cn("h-3.5 w-3.5 shrink-0", job.deadline && job.deadline < new Date().toISOString().slice(0,10) ? "text-red-400" : "text-zinc-400")} />
-            <span className={cn("text-[11px] font-semibold uppercase tracking-wider", job.deadline && job.deadline < new Date().toISOString().slice(0,10) ? "text-red-500" : "text-zinc-400")}>
+            <Calendar className={cn("h-3.5 w-3.5 shrink-0", job.deadline && job.deadline < new Date().toISOString().slice(0,10) ? "text-red-400" : "text-stone/70")} />
+            <span className={cn("text-[11px] font-semibold uppercase tracking-wider", job.deadline && job.deadline < new Date().toISOString().slice(0,10) ? "text-red-500" : "text-stone/70")}>
               Deadline{job.deadline && job.deadline < new Date().toISOString().slice(0,10) ? ' — passed!' : ''}
             </span>
           </div>
@@ -649,7 +652,7 @@ function OverviewTab({ job, onUpdate }: { job: CopilotJob; onUpdate: (u: Partial
             aria-label="Application deadline"
           />
           {job.deadline && (
-            <button onClick={() => onUpdate({ deadline: undefined })} className="text-zinc-400 hover:text-zinc-600" aria-label="Clear deadline">
+            <button onClick={() => onUpdate({ deadline: undefined })} className="text-stone/70 hover:text-stone" aria-label="Clear deadline">
               <X className="h-3 w-3" />
             </button>
           )}
@@ -658,14 +661,14 @@ function OverviewTab({ job, onUpdate }: { job: CopilotJob; onUpdate: (u: Partial
 
       {/* Company quick-links */}
       <div className="flex items-center gap-2 flex-wrap">
-        <span className="text-[11px] font-semibold text-zinc-400 uppercase tracking-wider">Research</span>
+        <span className="text-[11px] font-semibold text-stone/70 uppercase tracking-wider">Research</span>
         {[
           { label: 'Glassdoor', href: `https://www.glassdoor.com/Search/results.htm?keyword=${encodeURIComponent(job.company)}` },
           { label: 'LinkedIn', href: `https://www.linkedin.com/company/${encodeURIComponent(job.company.toLowerCase().replace(/\s+/g,'-'))}` },
           { label: 'Crunchbase', href: `https://www.crunchbase.com/textsearch?q=${encodeURIComponent(job.company)}` },
         ].map(({ label, href }) => (
           <a key={label} href={href} target="_blank" rel="noopener noreferrer"
-            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md border border-zinc-200 bg-zinc-50 hover:bg-white hover:border-zinc-300 text-[11px] font-medium text-zinc-600 transition-colors">
+            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md border border-line bg-paper-2 hover:bg-card hover:border-line-strong text-[11px] font-medium text-stone transition-colors">
             <ExternalLink className="h-2.5 w-2.5" /> {label}
           </a>
         ))}
@@ -682,7 +685,7 @@ function OverviewTab({ job, onUpdate }: { job: CopilotJob; onUpdate: (u: Partial
                   "px-2.5 py-1 rounded-md border text-[11px] font-medium transition-colors",
                   job.rejectionReason === k
                     ? "border-red-400 bg-red-100 text-red-700"
-                    : "border-zinc-200 bg-white text-zinc-500 hover:border-zinc-300",
+                    : "border-line bg-card text-stone hover:border-line-strong",
                 )}>
                 {v}
               </button>
@@ -720,10 +723,10 @@ function OverviewTab({ job, onUpdate }: { job: CopilotJob; onUpdate: (u: Partial
                 className="w-full flex items-center gap-2.5 p-2 rounded-md hover:bg-amber-50 transition-colors text-left"
               >
                 <div className={cn("h-4 w-4 rounded border-2 flex items-center justify-center shrink-0 transition-colors",
-                  item.done ? "bg-amber-500 border-amber-500" : "border-zinc-300 bg-white")}>
+                  item.done ? "bg-amber-500 border-amber-500" : "border-line-strong bg-card")}>
                   {item.done && <Check className="h-2.5 w-2.5 text-white" />}
                 </div>
-                <span className={cn("text-[12px] leading-snug", item.done ? "line-through text-zinc-400" : "text-zinc-700")}>
+                <span className={cn("text-[12px] leading-snug", item.done ? "line-through text-stone/70" : "text-ink-soft")}>
                   {item.text}
                 </span>
               </button>
@@ -738,11 +741,11 @@ function OverviewTab({ job, onUpdate }: { job: CopilotJob; onUpdate: (u: Partial
       {/* Job description */}
       {job.description ? (
         <div>
-          <h3 className="text-[11px] font-semibold text-zinc-400 uppercase tracking-wider mb-3">Description</h3>
-          <div className="rounded-lg bg-zinc-50/60 border border-zinc-100 p-4 max-h-[520px] overflow-y-auto">
+          <h3 className="text-[11px] font-semibold text-stone/70 uppercase tracking-wider mb-3">Description</h3>
+          <div className="rounded-lg bg-paper-2/60 border border-line p-4 max-h-[520px] overflow-y-auto">
             <JobDescriptionRenderer text={displayDesc} />
             {needsTruncate && !expanded && (
-              <div className="mt-3 pt-3 border-t border-zinc-100">
+              <div className="mt-3 pt-3 border-t border-line">
                 <button
                   className="text-[12px] text-brand-600 hover:text-brand-700 flex items-center gap-1 font-medium"
                   onClick={() => setExpanded(true)}
@@ -762,12 +765,12 @@ function OverviewTab({ job, onUpdate }: { job: CopilotJob; onUpdate: (u: Partial
           )}
         </div>
       ) : (
-        <p className="text-[13px] text-zinc-400 italic">No description available.</p>
+        <p className="text-[13px] text-stone/70 italic">No description available.</p>
       )}
 
       {/* Apply Kit — quick-copy companion */}
       {(job.aiContent?.coverLetter || job.aiContent?.tailoredResume) && (
-        <div className="rounded-xl border border-brand-100 bg-gradient-to-br from-brand-50/60 to-white p-4 space-y-3">
+        <div className="rounded-md border border-brand-100 bg-brand-50/40 p-4 space-y-3">
           <div className="flex items-center gap-2">
             <ClipboardCheck className="h-4 w-4 text-brand-500 shrink-0" />
             <h3 className="text-[12px] font-bold text-brand-800 uppercase tracking-wide">Apply Kit</h3>
@@ -807,30 +810,30 @@ function OverviewTab({ job, onUpdate }: { job: CopilotJob; onUpdate: (u: Partial
       {/* Connections + Contact row */}
       <div className="grid grid-cols-2 gap-3">
         <div>
-          <h3 className="text-[11px] font-semibold text-zinc-400 uppercase tracking-wider mb-2">Connections</h3>
+          <h3 className="text-[11px] font-semibold text-stone/70 uppercase tracking-wider mb-2">Connections</h3>
           <Input
             placeholder="Anyone you know there?"
             className="text-[12px] h-8"
             value={job.connections ?? ""}
             onChange={e => onUpdate({ connections: e.target.value || undefined })}
           />
-          <p className="text-[10px] text-zinc-400 mt-1">Name, LinkedIn, or email of an insider</p>
+          <p className="text-[10px] text-stone/70 mt-1">Name, LinkedIn, or email of an insider</p>
         </div>
         <div>
-          <h3 className="text-[11px] font-semibold text-zinc-400 uppercase tracking-wider mb-2">Contact</h3>
+          <h3 className="text-[11px] font-semibold text-stone/70 uppercase tracking-wider mb-2">Contact</h3>
           <Input
             placeholder="Recruiter or hiring manager"
             className="text-[12px] h-8"
             value={job.contact ?? ""}
             onChange={e => onUpdate({ contact: e.target.value || undefined })}
           />
-          <p className="text-[10px] text-zinc-400 mt-1">Name and email/LinkedIn of point of contact</p>
+          <p className="text-[10px] text-stone/70 mt-1">Name and email/LinkedIn of point of contact</p>
         </div>
       </div>
 
       {/* Notes */}
       <div>
-        <h3 className="text-[11px] font-semibold text-zinc-400 uppercase tracking-wider mb-2">Notes</h3>
+        <h3 className="text-[11px] font-semibold text-stone/70 uppercase tracking-wider mb-2">Notes</h3>
         <Textarea
           placeholder="Interview date, referral details, anything relevant…"
           className="text-[13px] resize-none min-h-[100px] leading-relaxed"
@@ -857,10 +860,10 @@ function ApplyKitRow({ label, preview, content }: { label: string; preview: stri
   }
 
   return (
-    <div className="flex items-center justify-between gap-3 bg-white rounded-lg border border-brand-100 px-3 py-2.5">
+    <div className="flex items-center justify-between gap-3 bg-card rounded-lg border border-brand-100 px-3 py-2.5">
       <div className="min-w-0 flex-1">
-        <p className="text-[12px] font-semibold text-zinc-800">{label}</p>
-        <p className="text-[11px] text-zinc-400 truncate mt-0.5">{preview}</p>
+        <p className="text-[12px] font-semibold text-ink">{label}</p>
+        <p className="text-[11px] text-stone/70 truncate mt-0.5">{preview}</p>
       </div>
       <button
         onClick={handleCopy}
@@ -961,7 +964,7 @@ function ResumeTab({ job, masterResume, masterResumeText, onAiContent, onUploadR
           {suggestions.map((s, i) => (
             <div key={i} className="border rounded-lg p-4 space-y-2">
               <div>
-                <p className="text-xs font-semibold text-zinc-400 uppercase mb-1">Original</p>
+                <p className="text-xs font-semibold text-stone/70 uppercase mb-1">Original</p>
                 <p className="text-sm text-muted-foreground italic">&ldquo;{s.original}&rdquo;</p>
               </div>
               <div>
@@ -995,7 +998,7 @@ function ResumeTab({ job, masterResume, masterResumeText, onAiContent, onUploadR
       {/* ── Export section ── */}
       <div className="border-t pt-4 space-y-3">
         <div>
-          <p className="text-[12px] font-semibold text-zinc-700">Export as PDF / LaTeX</p>
+          <p className="text-[12px] font-semibold text-ink-soft">Export as PDF / LaTeX</p>
           <p className="text-[11px] text-muted-foreground mt-0.5">
             Builds a complete tailored résumé document from your resume + this job, then downloads as a polished PDF or Overleaf-ready .tex file.
           </p>
@@ -1013,7 +1016,7 @@ function ResumeTab({ job, masterResume, masterResumeText, onAiContent, onUploadR
             <Button
               size="sm"
               variant="ghost"
-              className="h-7 text-[11px] text-zinc-400 hover:text-zinc-700 gap-1"
+              className="h-7 text-[11px] text-stone/70 hover:text-ink-soft gap-1"
               onClick={handleBuildDoc}
               disabled={docState === 'loading' || !masterResumeText}
             >
@@ -1069,7 +1072,7 @@ function CoverLetterTab({ job, masterResumeText, onAiContent, onUploadResume }: 
 
       {letter ? (
         <div className="space-y-3">
-          <pre className="text-sm text-foreground leading-relaxed whitespace-pre-wrap bg-zinc-50 border rounded-lg p-5 font-sans">
+          <pre className="text-sm text-foreground leading-relaxed whitespace-pre-wrap bg-paper-2 border rounded-lg p-5 font-sans">
             {letter}
           </pre>
           <div className="flex flex-wrap gap-2 items-center">
@@ -1078,7 +1081,7 @@ function CoverLetterTab({ job, masterResumeText, onAiContent, onUploadResume }: 
               <RefreshCw className={cn("h-3.5 w-3.5", state === 'loading' && "animate-spin")} />
               {state === 'loading' ? 'Regenerating…' : 'Regenerate'}
             </Button>
-            <div className="h-4 w-px bg-zinc-200 hidden sm:block" />
+            <div className="h-4 w-px bg-line hidden sm:block" />
             <ExportMenu
               variant="coverLetter"
               getCoverLetterBody={() => letter}
@@ -1141,13 +1144,13 @@ function InterviewTab({ job, masterResumeText, onAiContent, onUploadResume }: {
             <details key={i} className="border rounded-lg group">
               <summary className="flex items-start justify-between gap-3 p-4 cursor-pointer list-none">
                 <p className="text-sm font-medium">{q.question}</p>
-                <span className="text-xs px-2 py-0.5 rounded-full bg-zinc-100 text-zinc-500 shrink-0">{q.type}</span>
+                <span className="text-xs px-2 py-0.5 rounded-full bg-paper-2 text-stone shrink-0">{q.type}</span>
               </summary>
               {q.star && (
                 <div className="px-4 pb-4 space-y-2 border-t pt-3">
                   {(['situation', 'task', 'action', 'result'] as const).map(k => (
                     <div key={k}>
-                      <span className="text-xs font-semibold text-zinc-400 uppercase">{k}: </span>
+                      <span className="text-xs font-semibold text-stone/70 uppercase">{k}: </span>
                       <span className="text-sm text-muted-foreground">{q.star[k]}</span>
                     </div>
                   ))}
@@ -1215,7 +1218,7 @@ function FitTab({ job, masterResumeText, onAiContent, onUploadResume }: {
             <p className="text-3xl font-bold mt-0.5">{job.matchScore}<span className="text-base text-muted-foreground">%</span></p>
           </div>
           <div className="flex-1">
-            <div className="w-full bg-zinc-100 rounded-full h-2 overflow-hidden">
+            <div className="w-full bg-paper-2 rounded-full h-2 overflow-hidden">
               <div className="h-full bg-primary rounded-full" style={{ width: `${job.matchScore}%` }} />
             </div>
           </div>
@@ -1248,7 +1251,7 @@ function FitTab({ job, masterResumeText, onAiContent, onUploadResume }: {
             </div>
           )}
           {fitData.recommendation && (
-            <div className="p-3 bg-zinc-50 border rounded-lg text-sm">
+            <div className="p-3 bg-paper-2 border rounded-lg text-sm">
               <span className="font-medium">Recommendation: </span>
               <span className="text-muted-foreground">{fitData.recommendation}</span>
             </div>
@@ -1349,10 +1352,10 @@ function OutreachTab({ job, masterResumeText, onAiContent, onUploadResume }: {
       {error && <p className="text-xs text-red-500 p-3 border border-red-200 rounded-lg bg-red-50">{error}</p>}
 
       {!hasProperInfo && (
-        <div className="flex items-start gap-3 p-4 rounded-lg bg-zinc-50 border border-zinc-200 text-sm text-zinc-500">
-          <Info className="h-4 w-4 mt-0.5 shrink-0 text-zinc-400" />
+        <div className="flex items-start gap-3 p-4 rounded-lg bg-paper-2 border border-line text-sm text-stone">
+          <Info className="h-4 w-4 mt-0.5 shrink-0 text-stone/70" />
           <span>
-            <span className="font-medium text-zinc-700">Not enough job info.</span>{" "}
+            <span className="font-medium text-ink-soft">Not enough job info.</span>{" "}
             This job is missing a description or company name — outreach generation needs both to produce a personalised message.
             Edit the job to add a description first.
           </span>
@@ -1369,31 +1372,31 @@ function OutreachTab({ job, masterResumeText, onAiContent, onUploadResume }: {
         <div className="space-y-4">
           {mode === 'email' && (emailData ? (
             <>
-              <div className="rounded-lg border bg-zinc-50 p-4 space-y-2">
-                <p className="text-[11px] font-semibold uppercase tracking-wider text-zinc-400">Subject</p>
+              <div className="rounded-lg border bg-paper-2 p-4 space-y-2">
+                <p className="text-[11px] font-semibold uppercase tracking-wider text-stone/70">Subject</p>
                 <p className="text-sm font-medium">{emailData.subject}</p>
                 <CopyButton text={emailData.subject} />
               </div>
-              <div className="rounded-lg border bg-zinc-50 p-4 space-y-2">
-                <p className="text-[11px] font-semibold uppercase tracking-wider text-zinc-400">Body</p>
+              <div className="rounded-lg border bg-paper-2 p-4 space-y-2">
+                <p className="text-[11px] font-semibold uppercase tracking-wider text-stone/70">Body</p>
                 <pre className="text-sm text-foreground leading-relaxed whitespace-pre-wrap font-sans">{emailData.email}</pre>
                 <CopyButton text={emailData.email} />
               </div>
             </>
-          ) : <p className="text-sm text-zinc-400">Click regenerate to produce the cold email.</p>)}
+          ) : <p className="text-sm text-stone/70">Click regenerate to produce the cold email.</p>)}
 
           {mode === 'linkedin' && (linkedinText ? (
-            <div className="rounded-lg border bg-zinc-50 p-4 space-y-2">
+            <div className="rounded-lg border bg-paper-2 p-4 space-y-2">
               <div className="flex items-center justify-between">
-                <p className="text-[11px] font-semibold uppercase tracking-wider text-zinc-400">LinkedIn Note</p>
-                <span className={cn("text-[11px]", linkedinText.length > 280 ? "text-red-500 font-medium" : "text-zinc-400")}>
+                <p className="text-[11px] font-semibold uppercase tracking-wider text-stone/70">LinkedIn Note</p>
+                <span className={cn("text-[11px]", linkedinText.length > 280 ? "text-red-500 font-medium" : "text-stone/70")}>
                   {linkedinText.length}/300
                 </span>
               </div>
               <pre className="text-sm text-foreground leading-relaxed whitespace-pre-wrap font-sans">{linkedinText}</pre>
               <CopyButton text={linkedinText} />
             </div>
-          ) : <p className="text-sm text-zinc-400">Click regenerate to produce the LinkedIn note.</p>)}
+          ) : <p className="text-sm text-stone/70">Click regenerate to produce the LinkedIn note.</p>)}
 
           <Button size="sm" variant="outline" className="gap-2"
             disabled={state === 'loading' || !masterResumeText} onClick={handleGenerate}>
@@ -1415,7 +1418,7 @@ function SalaryTab({ job }: { job: CopilotJob }) {
         <p className="text-sm text-muted-foreground mt-1">Market data and negotiation talking points for this role.</p>
       </div>
       {job.salary && !['Not specified', 'Competitive'].includes(job.salary) && (
-        <div className="border rounded-lg p-4 bg-zinc-50">
+        <div className="border rounded-lg p-4 bg-paper-2">
           <p className="text-xs text-muted-foreground uppercase tracking-wider font-medium mb-1">Listed Salary</p>
           <p className="text-xl font-bold">{job.salary}</p>
         </div>
@@ -1471,7 +1474,7 @@ const TABS = [
   { id: 'skills',    label: 'Skills',         icon: Zap,        live: false },
 ] as const
 
-export function JobCopilotPanel({ job, masterResume, masterResumeText, onUpdate, onRemove, onUploadResume }: JobCopilotPanelProps) {
+export function JobCopilotPanel({ job, masterResume, masterResumeText, onUpdate, onRemove, onUploadResume, detailHref }: JobCopilotPanelProps) {
   const [activeTab, setActiveTab] = useState('overview')
 
   const handleAiContent = (content: Partial<CopilotJob['aiContent']>) => {
@@ -1483,11 +1486,11 @@ export function JobCopilotPanel({ job, masterResume, masterResumeText, onUpdate,
   return (
     <div className="h-full flex flex-col">
       {/* Job header */}
-      <div className="shrink-0 px-4 md:px-6 py-3 md:py-4 border-b bg-white">
+      <div className="shrink-0 px-4 md:px-6 py-3 md:py-4 border-b bg-card">
         <div className="flex items-start justify-between gap-4">
           <div className="min-w-0 flex-1">
             <h1 className="text-[15px] font-semibold truncate leading-snug">{job.title}</h1>
-            <p className="text-[13px] text-zinc-400 mt-0.5">
+            <p className="text-[13px] text-stone/70 mt-0.5">
               {job.company}
               {job.location && job.location !== 'Not specified' ? ` · ${job.location}` : ''}
               {job.salary && !['Not specified', 'Competitive'].includes(job.salary) ? ` · ${job.salary}` : ''}
@@ -1518,17 +1521,30 @@ export function JobCopilotPanel({ job, masterResume, masterResumeText, onUpdate,
               title={job.favorite ? 'Unfavorite' : 'Favorite'}
               className={cn(
                 "h-7 w-7",
-                job.favorite ? "text-amber-400 hover:text-amber-500" : "text-zinc-300 hover:text-amber-400",
+                job.favorite ? "text-amber-400 hover:text-amber-500" : "text-stone/40 hover:text-amber-400",
               )}
               onClick={() => onUpdate({ favorite: !job.favorite })}
             >
               <Star className={cn("h-3.5 w-3.5", job.favorite && "fill-amber-400")} />
             </Button>
+            {detailHref && (
+              <Link href={detailHref}>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  aria-label="Open full detail page"
+                  title="Open full detail page"
+                  className="h-7 w-7 text-stone/50 hover:text-brand-600"
+                >
+                  <ExternalLink className="h-3.5 w-3.5" />
+                </Button>
+              </Link>
+            )}
             <Button
               variant="ghost"
               size="icon"
               aria-label="Remove job"
-              className="h-7 w-7 text-zinc-400 hover:text-red-500 ml-1"
+              className="h-7 w-7 text-stone/70 hover:text-red-500 ml-1"
               onClick={onRemove}
             >
               <Trash2 className="h-3.5 w-3.5" />
@@ -1539,7 +1555,7 @@ export function JobCopilotPanel({ job, masterResume, masterResumeText, onUpdate,
 
       {/* Tabs */}
       <Tabs key={job.id} value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col overflow-hidden">
-        <div className="shrink-0 border-b bg-white px-2 md:px-4 overflow-x-auto">
+        <div className="shrink-0 border-b bg-card px-2 md:px-4 overflow-x-auto">
           <TabsList className="h-auto bg-transparent rounded-none p-0 gap-0 w-max">
             {TABS.map(({ id, label, icon: Icon, live }) => (
               <TabsTrigger
@@ -1549,14 +1565,14 @@ export function JobCopilotPanel({ job, masterResume, masterResumeText, onUpdate,
                   "rounded-none border-b-2 border-transparent px-2 md:px-3 py-2.5 text-[11px] md:text-xs font-medium gap-1 relative",
                   "data-[state=active]:border-brand-600 data-[state=active]:text-brand-600 data-[state=active]:bg-transparent",
                   live
-                    ? "data-[state=inactive]:text-zinc-500 data-[state=inactive]:hover:text-zinc-800"
-                    : "data-[state=inactive]:text-zinc-300 data-[state=inactive]:hover:text-zinc-400",
+                    ? "data-[state=inactive]:text-stone data-[state=inactive]:hover:text-ink"
+                    : "data-[state=inactive]:text-stone/40 data-[state=inactive]:hover:text-stone/70",
                 )}
               >
                 <Icon className="h-3.5 w-3.5" />
                 {label}
                 {!live && (
-                  <span className="absolute top-1.5 right-0.5 text-[8px] font-bold text-zinc-300 uppercase leading-none tracking-wide">
+                  <span className="absolute top-1.5 right-0.5 text-[8px] font-bold text-stone/40 uppercase leading-none tracking-wide">
                     soon
                   </span>
                 )}

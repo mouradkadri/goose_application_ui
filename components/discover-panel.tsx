@@ -117,7 +117,7 @@ export function DiscoverPanel({ onTrackJob }: DiscoverPanelProps) {
           <Compass className="h-5 w-5 text-brand-500" />
           <h2 className="text-xl font-bold tracking-tight">Discover</h2>
         </div>
-        <p className="text-[13px] text-zinc-400">
+        <p className="text-[13px] text-stone/70">
           Browse companies actively hiring — pulled directly from Greenhouse, Lever, and Ashby job boards.
           Track any role or generate a cold email in one click.
         </p>
@@ -126,7 +126,7 @@ export function DiscoverPanel({ onTrackJob }: DiscoverPanelProps) {
       {/* Search bar */}
       <div className="flex gap-2 mb-6 max-w-2xl">
         <div className="relative flex-1">
-          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-zinc-400 pointer-events-none" />
+          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-stone/70 pointer-events-none" />
           <Input
             value={role}
             onChange={e => setRole(e.target.value)}
@@ -157,16 +157,16 @@ export function DiscoverPanel({ onTrackJob }: DiscoverPanelProps) {
 
       {/* Results */}
       {!hasSearched && !loading && (
-        <div className="flex flex-col items-center justify-center py-20 text-zinc-400">
-          <Compass className="h-10 w-10 mb-3 text-zinc-300" />
+        <div className="flex flex-col items-center justify-center py-20 text-stone/70">
+          <Compass className="h-10 w-10 mb-3 text-stone/40" />
           <p className="text-sm font-medium">Search to discover companies hiring now</p>
           <p className="text-[12px] mt-1">Results come directly from company job boards — no aggregator middleman</p>
         </div>
       )}
 
       {hasSearched && !loading && companies.length === 0 && (
-        <div className="flex flex-col items-center justify-center py-20 text-zinc-400">
-          <Building2 className="h-10 w-10 mb-3 text-zinc-300" />
+        <div className="flex flex-col items-center justify-center py-20 text-stone/70">
+          <Building2 className="h-10 w-10 mb-3 text-stone/40" />
           <p className="text-sm font-medium">No matching roles found</p>
           <p className="text-[12px] mt-1">Try a broader title like "Engineer" or "Data" or leave location empty</p>
         </div>
@@ -176,11 +176,11 @@ export function DiscoverPanel({ onTrackJob }: DiscoverPanelProps) {
         <>
           {/* Summary + ATS filter */}
           <div className="flex items-center justify-between mb-4 max-w-3xl">
-            <p className="text-[13px] text-zinc-500">
-              <span className="font-semibold text-zinc-800">{totalJobs}</span> roles across{" "}
-              <span className="font-semibold text-zinc-800">{companies.length}</span> companies
+            <p className="text-[13px] text-stone">
+              <span className="font-semibold text-ink">{totalJobs}</span> roles across{" "}
+              <span className="font-semibold text-ink">{companies.length}</span> companies
               {cacheAgeH !== null && (
-                <span className="ml-2 text-[11px] text-zinc-400">
+                <span className="ml-2 text-[11px] text-stone/70">
                   · updated {cacheAgeH < 1 ? "just now" : `${cacheAgeH}h ago`}
                 </span>
               )}
@@ -194,7 +194,7 @@ export function DiscoverPanel({ onTrackJob }: DiscoverPanelProps) {
                     "text-[11px] px-2.5 py-1 rounded-full border font-medium transition-colors",
                     atsFilter === opt
                       ? "bg-brand-600 text-white border-brand-600"
-                      : "bg-white text-zinc-500 border-zinc-200 hover:border-zinc-300"
+                      : "bg-card text-stone border-line hover:border-zinc-300"
                   )}
                 >
                   {opt}
@@ -207,34 +207,34 @@ export function DiscoverPanel({ onTrackJob }: DiscoverPanelProps) {
           <div className="space-y-3 max-w-3xl">
             {filteredCompanies.map(company => {
               const isOpen = expandedCompany === company.name
-              const atsColor = ATS_COLORS[company.ats] ?? "bg-zinc-100 text-zinc-600 border-zinc-200"
+              const atsColor = ATS_COLORS[company.ats] ?? "bg-paper-2 text-stone border-line"
 
               return (
-                <div key={company.name} className="border rounded-xl bg-white overflow-hidden">
+                <div key={company.name} className="border rounded-md bg-card overflow-hidden">
                   {/* Company header */}
                   <button
                     onClick={() => setExpandedCompany(isOpen ? null : company.name)}
-                    className="w-full flex items-center justify-between p-4 hover:bg-zinc-50 transition-colors text-left"
+                    className="w-full flex items-center justify-between p-4 hover:bg-paper-2 transition-colors text-left"
                   >
                     <div className="flex items-center gap-3 min-w-0">
-                      <div className="h-9 w-9 rounded-lg bg-zinc-100 border border-zinc-200 flex items-center justify-center text-sm font-bold text-zinc-600 shrink-0">
+                      <div className="h-9 w-9 rounded-lg bg-paper-2 border border-line flex items-center justify-center text-sm font-bold text-stone shrink-0">
                         {company.name.replace(/^the\s+/i, "")[0]?.toUpperCase() ?? "?"}
                       </div>
                       <div className="min-w-0">
-                        <p className="font-semibold text-[14px] text-zinc-900 truncate">{company.name}</p>
+                        <p className="font-semibold text-[14px] text-ink truncate">{company.name}</p>
                         <div className="flex items-center gap-2 mt-0.5">
                           <span className={cn("text-[10px] font-semibold px-1.5 py-0.5 rounded border", atsColor)}>
                             {company.ats}
                           </span>
-                          <span className="text-[12px] text-zinc-400">
+                          <span className="text-[12px] text-stone/70">
                             {company.job_count} role{company.job_count !== 1 ? "s" : ""}
                           </span>
                         </div>
                       </div>
                     </div>
                     {isOpen
-                      ? <ChevronUp className="h-4 w-4 text-zinc-400 shrink-0" />
-                      : <ChevronDown className="h-4 w-4 text-zinc-400 shrink-0" />
+                      ? <ChevronUp className="h-4 w-4 text-stone/70 shrink-0" />
+                      : <ChevronDown className="h-4 w-4 text-stone/70 shrink-0" />
                     }
                   </button>
 
@@ -247,27 +247,27 @@ export function DiscoverPanel({ onTrackJob }: DiscoverPanelProps) {
                         const hasDescription = !!(job.description?.trim().length > 150)
 
                         return (
-                          <div key={i} className="flex items-start justify-between gap-3 p-4 hover:bg-zinc-50/50 transition-colors">
+                          <div key={i} className="flex items-start justify-between gap-3 p-4 hover:bg-paper-2/50 transition-colors">
                             <div className="min-w-0 flex-1">
-                              <p className="text-[13px] font-semibold text-zinc-900 truncate">{job.title}</p>
+                              <p className="text-[13px] font-semibold text-ink truncate">{job.title}</p>
                               <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 mt-0.5">
                                 {job.location && (
-                                  <span className="text-[11px] text-zinc-400">{job.location}</span>
+                                  <span className="text-[11px] text-stone/70">{job.location}</span>
                                 )}
                                 {job.job_type && (
-                                  <span className="text-[11px] text-zinc-400">· {job.job_type}</span>
+                                  <span className="text-[11px] text-stone/70">· {job.job_type}</span>
                                 )}
                                 {job.salary && (
-                                  <span className="text-[11px] text-zinc-400">· {job.salary}</span>
+                                  <span className="text-[11px] text-stone/70">· {job.salary}</span>
                                 )}
                                 {job.date_posted && (
-                                  <span className="text-[11px] text-zinc-300">· {job.date_posted}</span>
+                                  <span className="text-[11px] text-stone/40">· {job.date_posted}</span>
                                 )}
                               </div>
                               {job.tags?.filter(Boolean).length > 0 && (
                                 <div className="flex flex-wrap gap-1 mt-1.5">
                                   {job.tags.filter(Boolean).slice(0, 4).map((tag, ti) => (
-                                    <span key={ti} className="text-[10px] bg-zinc-100 text-zinc-500 px-1.5 py-0.5 rounded">
+                                    <span key={ti} className="text-[10px] bg-paper-2 text-stone px-1.5 py-0.5 rounded">
                                       {tag}
                                     </span>
                                   ))}
@@ -286,7 +286,7 @@ export function DiscoverPanel({ onTrackJob }: DiscoverPanelProps) {
                                   href={job.apply_url}
                                   target="_blank"
                                   rel="noopener noreferrer"
-                                  className="inline-flex items-center gap-1 text-[11px] px-2 py-1 rounded border border-zinc-200 text-zinc-500 hover:bg-zinc-100 transition-colors"
+                                  className="inline-flex items-center gap-1 text-[11px] px-2 py-1 rounded border border-line text-stone hover:bg-paper-2 transition-colors"
                                 >
                                   <ExternalLink className="h-3 w-3" /> Apply
                                 </a>

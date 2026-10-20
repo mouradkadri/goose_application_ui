@@ -100,7 +100,7 @@ export default function JobTracker() {
       <header className="border-b border-border bg-card">
         <div className="flex items-center justify-between px-4 md:px-6 py-4">
           <div className="flex items-center gap-3">
-            <Link href="/">
+            <Link href="/workspace">
               <Button variant="ghost" size="sm">
                 <ArrowLeft className="h-4 w-4 mr-2" />
                 Back
@@ -141,7 +141,7 @@ export default function JobTracker() {
                 <p className="text-muted-foreground text-sm mt-1">
                   Hit "Save for Later" on any job to track it here
                 </p>
-                <Link href="/">
+                <Link href="/workspace">
                   <Button className="mt-4">Browse Jobs</Button>
                 </Link>
               </div>
@@ -162,7 +162,7 @@ export default function JobTracker() {
                 <p className="text-muted-foreground text-sm mt-1">
                   Click "Apply for this Job" on any matched job to track it here
                 </p>
-                <Link href="/">
+                <Link href="/workspace">
                   <Button className="mt-4">Find Jobs</Button>
                 </Link>
               </div>

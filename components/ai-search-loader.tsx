@@ -38,7 +38,7 @@ export function AiSearchLoader({
     <div
       role="dialog"
       aria-label={hasError ? "Search failed" : isFinished ? "Search complete" : "Searching for jobs"}
-      className="absolute inset-0 z-30 flex items-center justify-center bg-white/96 backdrop-blur-md"
+      className="absolute inset-0 z-30 flex items-center justify-center bg-paper/96 backdrop-blur-md"
     >
       <div className="w-full max-w-sm mx-auto px-6 flex flex-col items-center gap-6">
 
@@ -53,12 +53,12 @@ export function AiSearchLoader({
               <CheckCircle2 className="h-8 w-8 text-emerald-500" />
             </div>
           ) : isNoResults ? (
-            <div className="h-16 w-16 rounded-full bg-zinc-50 border border-zinc-200 flex items-center justify-center">
+            <div className="h-16 w-16 rounded-full bg-paper-2 border border-line flex items-center justify-center">
               <span className="text-2xl select-none">🦆</span>
             </div>
           ) : (
             /* Goose animation while running */
-            <div className="flex flex-col items-center gap-2">
+            <div className="rounded-md overflow-hidden">
               <Image
                 src="/goose.gif"
                 alt="Hunting for your best matches…"
@@ -66,7 +66,6 @@ export function AiSearchLoader({
                 height={88}
                 priority
                 unoptimized
-                className="rounded-xl"
               />
             </div>
           )}
@@ -76,27 +75,27 @@ export function AiSearchLoader({
         <div className="text-center">
           {hasError ? (
             <>
-              <p className="text-[15px] font-semibold tracking-tight text-zinc-900">Search failed</p>
-              <p className="text-[13px] text-zinc-500 mt-1 leading-relaxed max-w-xs">{error}</p>
+              <p className="text-[15px] font-semibold tracking-tight text-ink">Search failed</p>
+              <p className="text-[13px] text-stone mt-1 leading-relaxed max-w-xs">{error}</p>
             </>
           ) : isNoResults ? (
             <>
-              <p className="text-[15px] font-semibold tracking-tight text-zinc-900">No matches found</p>
-              <p className="text-[13px] text-zinc-500 mt-1 leading-relaxed max-w-xs">
+              <p className="text-[15px] font-semibold tracking-tight text-ink">No matches found</p>
+              <p className="text-[13px] text-stone mt-1 leading-relaxed max-w-xs">
                 Try <strong>Remote (worldwide)</strong> or another supported region and search again.
               </p>
             </>
           ) : isFinished ? (
             <>
-              <p className="text-[15px] font-semibold tracking-tight text-zinc-900">
+              <p className="text-[15px] font-semibold tracking-tight text-ink">
                 Found {jobCount} matching {jobCount === 1 ? "job" : "jobs"}
               </p>
-              <p className="text-[13px] text-zinc-500 mt-1">Your workspace is ready.</p>
+              <p className="text-[13px] text-stone mt-1">Your workspace is ready.</p>
             </>
           ) : (
             <>
-              <p className="text-[15px] font-semibold tracking-tight text-zinc-900">Hunting for your best matches</p>
-              <p className="text-[13px] text-zinc-500 mt-1">This usually takes 1–2 minutes.</p>
+              <p className="text-[15px] font-semibold tracking-tight text-ink">Hunting for your best matches</p>
+              <p className="text-[13px] text-stone mt-1">This usually takes 1–2 minutes.</p>
             </>
           )}
         </div>
@@ -106,7 +105,7 @@ export function AiSearchLoader({
           role="log"
           aria-live="polite"
           aria-label="Search progress"
-          className="w-full max-h-44 overflow-y-auto rounded-lg bg-zinc-50 border border-zinc-100 p-3 space-y-1.5"
+          className="w-full max-h-44 overflow-y-auto rounded-lg bg-paper-2 border border-line p-3 space-y-1.5"
         >
           {logs.map((log, i) => {
             const isLast = i === logs.length - 1 && isRunning
@@ -125,7 +124,7 @@ export function AiSearchLoader({
                 )}
                 <span className={cn(
                   "leading-snug",
-                  isLast ? "text-zinc-700 font-medium" : "text-zinc-400",
+                  isLast ? "text-ink-soft font-medium" : "text-stone/70",
                 )}>
                   {log}
                 </span>
@@ -133,7 +132,7 @@ export function AiSearchLoader({
             )
           })}
           {logs.length === 0 && (
-            <div className="flex items-center gap-2.5 text-[13px] text-zinc-400">
+            <div className="flex items-center gap-2.5 text-[13px] text-stone/70">
               <Loader2 className="h-3.5 w-3.5 shrink-0 animate-spin text-brand-400" />
               <span>Starting up…</span>
             </div>
@@ -175,7 +174,7 @@ export function AiSearchLoader({
         {isRunning && onRunInBackground && (
           <button
             onClick={onRunInBackground}
-            className="flex items-center gap-1.5 text-[12px] text-zinc-400 hover:text-zinc-600 transition-colors -mt-2"
+            className="flex items-center gap-1.5 text-[12px] text-stone/70 hover:text-stone transition-colors -mt-2"
           >
             <ArrowUpRight className="h-3.5 w-3.5" />
             Run in background

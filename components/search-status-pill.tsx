@@ -25,7 +25,7 @@ export function SearchStatusPill({ logs, onDismiss }: SearchStatusPillProps) {
       role="status"
       aria-live="polite"
       aria-label={`AI job search in progress: ${logSnippet}`}
-      className="fixed bottom-5 right-5 z-50 flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl bg-zinc-900 border border-zinc-700 shadow-xl text-white animate-in slide-in-from-bottom-2 fade-in duration-200"
+      className="fixed bottom-5 right-5 z-50 flex items-center gap-2.5 px-3.5 py-2.5 rounded-md bg-zinc-900 border border-zinc-700 shadow text-white animate-in slide-in-from-bottom-2 fade-in duration-200"
     >
       {/* Goose animation */}
       <Image
@@ -41,14 +41,14 @@ export function SearchStatusPill({ logs, onDismiss }: SearchStatusPillProps) {
       {/* Status text */}
       <div className="min-w-0">
         <p className="text-[12px] font-semibold leading-none text-white">Hunting jobs…</p>
-        <p className="text-[11px] text-zinc-400 mt-0.5 truncate max-w-[160px]">{logSnippet}</p>
+        <p className="text-[11px] text-stone/70 mt-0.5 truncate max-w-[160px]">{logSnippet}</p>
       </div>
 
       {/* Dismiss */}
       <button
         onClick={onDismiss}
         aria-label="Cancel background search"
-        className="ml-1 text-zinc-500 hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-brand-400 rounded"
+        className="ml-1 text-stone hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-brand-400 rounded"
       >
         <X className="h-3.5 w-3.5" />
       </button>

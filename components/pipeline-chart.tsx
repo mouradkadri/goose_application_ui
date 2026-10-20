@@ -26,7 +26,7 @@ function ConversionRate({ from, to }: { from: number; to: number }) {
   if (from === 0) return null
   const rate = Math.round((to / from) * 100)
   return (
-    <span className="text-[10px] text-zinc-400 font-medium">{rate}%</span>
+    <span className="text-[10px] text-stone/70 font-medium">{rate}%</span>
   )
 }
 
@@ -37,8 +37,8 @@ function StageBox({
     <button
       onClick={onClick}
       className={cn(
-        "flex flex-col items-center justify-center rounded-xl border transition-all",
-        "hover:shadow-md hover:scale-[1.02] active:scale-[0.99] focus-visible:outline-none",
+        "flex flex-col items-center justify-center rounded-md border transition-colors",
+        "hover:brightness-95 focus-visible:outline-none",
         bgColor, borderColor,
         size === 'md' ? "p-3 min-w-[80px]" : "p-2 min-w-[64px]",
       )}
@@ -59,7 +59,7 @@ export function PipelineChart({ toApply, applied, interview, offer, rejected, gh
 
   if (!hasActivity) {
     return (
-      <div className="flex items-center justify-center py-8 text-[13px] text-zinc-400">
+      <div className="flex items-center justify-center py-8 text-[13px] text-stone/70">
         No applications yet — add jobs and start tracking.
       </div>
     )
@@ -73,15 +73,15 @@ export function PipelineChart({ toApply, applied, interview, offer, rejected, gh
         <StageBox
           label="To Apply"
           count={toApply}
-          color="text-zinc-500"
-          bgColor="bg-zinc-50"
-          borderColor="border-zinc-200"
-          textColor="text-zinc-700"
+          color="text-stone"
+          bgColor="bg-paper-2"
+          borderColor="border-line"
+          textColor="text-ink-soft"
           onClick={() => onStageClick?.('to_apply')}
         />
 
         <div className="flex flex-col items-center gap-0.5 px-1">
-          <ChevronRight className="h-4 w-4 text-zinc-300" />
+          <ChevronRight className="h-4 w-4 text-stone/40" />
           <ConversionRate from={toApply} to={applied} />
         </div>
 
@@ -97,7 +97,7 @@ export function PipelineChart({ toApply, applied, interview, offer, rejected, gh
         />
 
         <div className="flex flex-col items-center gap-0.5 px-1">
-          <ChevronRight className="h-4 w-4 text-zinc-300" />
+          <ChevronRight className="h-4 w-4 text-stone/40" />
           <ConversionRate from={applied} to={interview} />
         </div>
 
@@ -113,7 +113,7 @@ export function PipelineChart({ toApply, applied, interview, offer, rejected, gh
         />
 
         <div className="flex flex-col items-center gap-0.5 px-1">
-          <ChevronRight className="h-4 w-4 text-zinc-300" />
+          <ChevronRight className="h-4 w-4 text-stone/40" />
           <ConversionRate from={interview} to={offer} />
         </div>
 
@@ -132,9 +132,9 @@ export function PipelineChart({ toApply, applied, interview, offer, rejected, gh
       {/* Outcome branches row */}
       {(rejected > 0 || ghosted > 0) && (
         <div className="flex items-center justify-center gap-3">
-          <div className="h-px w-12 bg-zinc-100" />
-          <span className="text-[10px] text-zinc-300 font-medium uppercase tracking-wide">outcomes</span>
-          <div className="h-px flex-1 max-w-[80px] bg-zinc-100" />
+          <div className="h-px w-12 bg-paper-2" />
+          <span className="text-[10px] text-stone/40 font-medium uppercase tracking-wide">outcomes</span>
+          <div className="h-px flex-1 max-w-[80px] bg-paper-2" />
           {rejected > 0 && (
             <StageBox
               label="Rejected"
@@ -151,24 +151,24 @@ export function PipelineChart({ toApply, applied, interview, offer, rejected, gh
             <StageBox
               label="Ghosted"
               count={ghosted}
-              color="text-zinc-400"
-              bgColor="bg-zinc-50"
-              borderColor="border-zinc-100"
-              textColor="text-zinc-500"
+              color="text-stone/70"
+              bgColor="bg-paper-2"
+              borderColor="border-line"
+              textColor="text-stone"
               size="sm"
               onClick={() => onStageClick?.('ghosted')}
             />
           )}
-          <div className="h-px w-12 bg-zinc-100" />
+          <div className="h-px w-12 bg-paper-2" />
         </div>
       )}
 
       {/* Conversion summary bar */}
       {applied > 0 && (
         <div className="mt-2 space-y-1.5">
-          <div className="flex items-center gap-2 text-[10px] text-zinc-400">
+          <div className="flex items-center gap-2 text-[10px] text-stone/70">
             <span>Overall funnel</span>
-            <div className="flex-1 h-1.5 rounded-full bg-zinc-100 overflow-hidden flex">
+            <div className="flex-1 h-1.5 rounded-full bg-paper-2 overflow-hidden flex">
               {offer > 0 && (
                 <div
                   className="h-full bg-emerald-400 shrink-0"
@@ -189,7 +189,7 @@ export function PipelineChart({ toApply, applied, interview, offer, rejected, gh
               )}
               {ghosted > 0 && (
                 <div
-                  className="h-full bg-zinc-300 shrink-0"
+                  className="h-full bg-line-strong shrink-0"
                   style={{ width: `${(ghosted / applied) * 100}%` }}
                 />
               )}

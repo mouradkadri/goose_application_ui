@@ -116,7 +116,7 @@ export function QuickApplyModal({ jobs, onApplied, onClose }: QuickApplyModalPro
         <DialogHeader>
           <DialogTitle className="text-base font-semibold flex items-center justify-between">
             <span>Quick Apply</span>
-            <span className="text-[12px] font-normal text-zinc-400">
+            <span className="text-[12px] font-normal text-stone/70">
               {done ? `${appliedIds.length} applied · ${skippedIds.length} skipped` : `${index + 1} of ${jobs.length}`}
             </span>
           </DialogTitle>
@@ -126,10 +126,10 @@ export function QuickApplyModal({ jobs, onApplied, onClose }: QuickApplyModalPro
           <div className="py-6 flex flex-col items-center text-center gap-3">
             <CheckCircle2 className="h-10 w-10 text-emerald-500" />
             <div>
-              <p className="font-semibold text-zinc-900">Session complete!</p>
-              <p className="text-[13px] text-zinc-500 mt-1">
+              <p className="font-semibold text-ink">Session complete!</p>
+              <p className="text-[13px] text-stone mt-1">
                 Applied to <span className="font-semibold text-emerald-600">{appliedIds.length}</span> job{appliedIds.length !== 1 ? 's' : ''} ·{' '}
-                skipped <span className="font-semibold text-zinc-500">{skippedIds.length}</span>
+                skipped <span className="font-semibold text-stone">{skippedIds.length}</span>
               </p>
             </div>
             <Button size="sm" onClick={onClose} className="mt-2 bg-brand-600 hover:bg-brand-700 text-white">
@@ -139,7 +139,7 @@ export function QuickApplyModal({ jobs, onApplied, onClose }: QuickApplyModalPro
         ) : (
           <div className="space-y-4">
             {/* Progress bar */}
-            <div className="w-full h-1 rounded-full bg-zinc-100 overflow-hidden">
+            <div className="w-full h-1 rounded-full bg-paper-2 overflow-hidden">
               <div
                 className="h-full bg-brand-500 transition-all duration-300 rounded-full"
                 style={{ width: `${(index / jobs.length) * 100}%` }}
@@ -147,23 +147,23 @@ export function QuickApplyModal({ jobs, onApplied, onClose }: QuickApplyModalPro
             </div>
 
             {/* Job card */}
-            <div className="rounded-lg border border-zinc-200 p-4 space-y-2">
+            <div className="rounded-lg border border-line p-4 space-y-2">
               <div className="flex items-start gap-2">
-                <div className="h-8 w-8 rounded-md bg-zinc-100 border border-zinc-200 flex items-center justify-center shrink-0">
-                  <span className="text-[12px] font-bold text-zinc-500">
+                <div className="h-8 w-8 rounded-md bg-paper-2 border border-line flex items-center justify-center shrink-0">
+                  <span className="text-[12px] font-bold text-stone">
                     {job.company.replace(/^the\s+/i, '').trim()[0]?.toUpperCase() ?? '?'}
                   </span>
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className="text-[14px] font-semibold text-zinc-900 leading-snug">{job.title}</p>
-                  <p className="text-[12px] text-zinc-500 mt-0.5">{job.company}</p>
+                  <p className="text-[14px] font-semibold text-ink leading-snug">{job.title}</p>
+                  <p className="text-[12px] text-stone mt-0.5">{job.company}</p>
                 </div>
                 <div className={cn("h-2 w-2 rounded-full shrink-0 mt-1", STATUS_COLORS[job.status])} />
               </div>
 
               <div className="flex flex-wrap gap-1.5">
                 {job.location && job.location !== 'Not specified' && (
-                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-zinc-50 border border-zinc-100 text-[11px] text-zinc-500">
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-paper-2 border border-line text-[11px] text-stone">
                     <MapPin className="h-2.5 w-2.5" />{job.location}
                   </span>
                 )}
@@ -175,7 +175,7 @@ export function QuickApplyModal({ jobs, onApplied, onClose }: QuickApplyModalPro
               </div>
 
               {job.description && (
-                <p className="text-[12px] text-zinc-400 leading-relaxed line-clamp-3">
+                <p className="text-[12px] text-stone/70 leading-relaxed line-clamp-3">
                   {job.description.slice(0, 280)}
                 </p>
               )}
@@ -215,7 +215,7 @@ export function QuickApplyModal({ jobs, onApplied, onClose }: QuickApplyModalPro
                   <ExternalLink className="h-3.5 w-3.5" /> Open & Apply
                 </Button>
               ) : (
-                <p className="text-[12px] text-zinc-400 text-center">No apply URL — mark as applied manually.</p>
+                <p className="text-[12px] text-stone/70 text-center">No apply URL — mark as applied manually.</p>
               )}
 
               <div className="flex gap-2">
@@ -229,7 +229,7 @@ export function QuickApplyModal({ jobs, onApplied, onClose }: QuickApplyModalPro
                 </Button>
                 <Button
                   variant="ghost"
-                  className="flex-1 gap-1.5 text-zinc-500"
+                  className="flex-1 gap-1.5 text-stone"
                   onClick={handleSkip}
                 >
                   <SkipForward className="h-3.5 w-3.5" /> Skip
@@ -238,7 +238,7 @@ export function QuickApplyModal({ jobs, onApplied, onClose }: QuickApplyModalPro
             </div>
 
             {jobs.length - index - 1 > 0 && (
-              <p className="text-[11px] text-center text-zinc-400">
+              <p className="text-[11px] text-center text-stone/70">
                 {jobs.length - index - 1} more job{jobs.length - index - 1 !== 1 ? 's' : ''} in queue
               </p>
             )}
